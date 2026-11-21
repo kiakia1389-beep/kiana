@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>برنامهٔ درسی هوشمند</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1b2f7a">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+@font-face{font-family:'Vazirmatn';font-weight:400 600;src:local('Vazirmatn'),local('Vazirmatn Regular'),url('fonts/Vazirmatn-Regular.woff2') format('woff2')}
+@font-face{font-family:'Vazirmatn';font-weight:700 800;src:local('Vazirmatn Bold'),url('fonts/Vazirmatn-Bold.woff2') format('woff2')}
+@font-face{font-family:'Noto Nastaliq Urdu';font-weight:400 700;src:local('Noto Nastaliq Urdu'),url('fonts/NotoNastaliqUrdu.ttf') format('truetype')}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap">
+<style>
+/* Layout: right-hand nav on desktop, bottom tab bar on phone; six pages share one tokenized card language */
+:root{color-scheme:light}
+:root{
+  --bg:#eef2f8;--surface:#ffffff;--surface2:#f6f8fc;--fg:#14213d;--muted:#5b6578;--line:#dde3ee;--accent:#2f5bd9;--accent-fg:#ffffff;--done:#1f9d6b;--warn:#d98a1e;--bad:#d64545;
+  --hero-a:#1b2f7a;--hero-b:#0e7f9c;--hero-c:#27b58a;
+  --c-phys:#2f5bd9;--c-chem:#d9531e;--c-bio:#1f9d6b;--c-math:#7b4fd1;--c-geo:#a8741a;--c-eng:#0e8fa8;--c-ar:#c13c78;--c-fa:#6f8f1d;--c-rel:#4a6fa5;--c-his:#9a6b2f;--c-env:#3f9a8a;--c-pe:#e0872b;--c-ink:#c2336b;--c-none:#8a93a5;
+  --font:'Vazirmatn',Tahoma,'Segoe UI',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c1222;--surface:#151d33;--surface2:#1b2440;--fg:#e8ecf6;--muted:#9aa5bd;--line:#27324d;--accent:#7f9cff;--accent-fg:#0c1222;--done:#48c796;--warn:#f0b04a;--bad:#ff7b7b;
+  --hero-a:#16286a;--hero-b:#0b6a84;--hero-c:#1f9c78;
+  --c-phys:#7f9cff;--c-chem:#ff8a5c;--c-bio:#48c796;--c-math:#b79bff;--c-geo:#e0b25a;--c-eng:#4cc9e0;--c-ar:#ff86b4;--c-fa:#b4d457;--c-rel:#8fb0e6;--c-his:#d9a56a;--c-env:#6fd1bf;--c-pe:#ffb066;--c-ink:#ff7aa8;--c-none:#8e98ad;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1222;--surface:#151d33;--surface2:#1b2440;--fg:#e8ecf6;--muted:#9aa5bd;--line:#27324d;--accent:#7f9cff;--accent-fg:#0c1222;--done:#48c796;--warn:#f0b04a;--bad:#ff7b7b;
+  --hero-a:#16286a;--hero-b:#0b6a84;--hero-c:#1f9c78;
+  --c-phys:#7f9cff;--c-chem:#ff8a5c;--c-bio:#48c796;--c-math:#b79bff;--c-geo:#e0b25a;--c-eng:#4cc9e0;--c-ar:#ff86b4;--c-fa:#b4d457;--c-rel:#8fb0e6;--c-his:#d9a56a;--c-env:#6fd1bf;--c-pe:#ffb066;--c-ink:#ff7aa8;--c-none:#8e98ad;color-scheme:dark}
+*{box-sizing:border-box}
+html{direction:rtl}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.75;margin:0;
+  padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));padding-block:14px 96px}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+ol,ul{list-style:none;margin:0;padding:0}
+.app{max-width:1100px;margin:0 auto;display:grid;gap:16px}
+.bar-top{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem}
+.logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--hero-a),var(--hero-c));display:grid;place-items:center;color:#fff}
+.sync{font-size:.74rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.sync.on i{background:var(--done)}
+.nav{position:fixed;inset:auto 0 0 0;z-index:20;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:space-around;
+  padding:6px max(6px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px))}
+.nav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:.7rem;color:var(--muted);padding:4px 2px;border-radius:10px;cursor:pointer;min-width:0}
+.nav button[aria-current="page"]{color:var(--accent);font-weight:700}
+.nav svg{width:22px;height:22px}
+.shell{display:grid;gap:16px;min-width:0}
+@media (min-width:900px){
+  body{padding-bottom:40px}
+  .shell{grid-template-columns:200px 1fr;align-items:start}
+  .nav{position:sticky;top:14px;inset:auto;flex-direction:column;justify-content:flex-start;border:1px solid var(--line);border-radius:18px;padding:10px;gap:4px;order:0}
+  .nav button{flex:none;flex-direction:row;gap:10px;font-size:.92rem;padding:10px 12px;justify-content:flex-start}
+  .nav button[aria-current="page"]{background:color-mix(in srgb,var(--accent) 13%,transparent)}
+}
+main{min-width:0;display:grid;gap:14px;align-content:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 18px;min-width:0}
+.card h2{font-size:1.1rem;font-weight:800;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card h3{font-size:.98rem;font-weight:700;margin-bottom:6px}
+.muted{color:var(--muted)}.small{font-size:.82rem}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.gs{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+.hero{border-radius:22px;padding:20px;color:#fff;background:linear-gradient(135deg,var(--hero-a),var(--hero-b) 55%,var(--hero-c));display:grid;gap:14px}
+.hero .who{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.av{overflow:hidden;width:112px;height:112px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:1.7rem;font-weight:800;flex:none;border:3px solid rgba(255,255,255,.7);box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.hero h1{font-family:'Noto Nastaliq Urdu','Vazirmatn',Tahoma,serif;font-size:2.4rem;font-weight:700;line-height:2;white-space:nowrap;overflow-wrap:normal;padding-block:.15em;text-shadow:0 2px 10px rgba(0,0,0,.25)}
+.hero .line{opacity:.95;font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);border-radius:99px;padding:2px 12px;font-size:.8rem}
+.btn{border:0;background:var(--accent);color:var(--accent-fg);padding:8px 15px;border-radius:11px;cursor:pointer;font-weight:700;font-size:.88rem}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line);font-weight:500}
+.btn.sm{padding:4px 11px;font-size:.8rem}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 45%,var(--line))}
+.hero .btn{background:rgba(255,255,255,.22);color:#fff;border:1px solid rgba(255,255,255,.4)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible+.chk{outline:3px solid var(--accent);outline-offset:2px}
+.alerts{display:grid;gap:8px}
+.alert{display:flex;gap:12px;align-items:center;border-radius:14px;padding:10px 14px;border:1px solid;background:var(--surface)}
+.alert b{font-weight:800}
+.alert.a0{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--surface))}
+.alert.a1{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,var(--surface))}
+.alert.a2{border-color:var(--c-eng);background:color-mix(in srgb,var(--c-eng) 12%,var(--surface))}
+.alert.a3{border-color:var(--line)}
+.alert .big{font-size:1.5rem;font-weight:800;min-width:2.2em;text-align:center;font-variant-numeric:tabular-nums}
+.alert.ok{border-color:color-mix(in srgb,var(--done) 45%,var(--line));background:color-mix(in srgb,var(--done) 9%,var(--surface))}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;justify-items:center;gap:4px;text-align:center}
+.tile .lab{font-weight:700;font-size:.88rem}
+.tile .sub{font-size:.76rem;color:var(--muted)}
+.ring{width:92px;height:92px}
+.ring text{font-family:var(--font);font-weight:800;fill:var(--fg)}
+.pill{display:inline-block;font-size:.74rem;font-weight:700;line-height:1.55;padding:0 9px;border-radius:99px;color:var(--sc,var(--c-none));background:color-mix(in srgb,var(--sc,var(--c-none)) 14%,transparent);border:1px solid color-mix(in srgb,var(--sc,var(--c-none)) 35%,transparent)}
+.rows{display:grid;gap:8px}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:14px;border-inline-start:5px solid var(--sc,var(--c-none));display:flex;align-items:flex-start;gap:6px;min-width:0}
+.row.minor{border-inline-start-color:var(--line);background:var(--surface2)}
+.row.k-class{border-color:color-mix(in srgb,var(--sc) 55%,var(--line));border-inline-start-color:var(--sc)}
+.row label{flex:1;display:flex;align-items:flex-start;gap:11px;padding:10px 12px;cursor:pointer;min-width:0}
+.row input{position:absolute;opacity:0;pointer-events:none}
+.chk{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--muted);margin-top:2px;display:grid;place-items:center;background:var(--surface)}
+.chk::after{content:"";width:12px;height:7px;border:solid var(--accent-fg);border-width:0 0 3px 3px;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+input:checked+.chk{background:var(--done);border-color:var(--done)}
+input:checked+.chk::after{opacity:1}
+.tm{flex:none;display:flex;flex-direction:column;align-items:center;min-width:3.5em;font-variant-numeric:tabular-nums;line-height:1.35;margin-top:1px}
+.tm b{font-weight:700}.tm span{font-size:.78rem;color:var(--muted)}
+.row.k-class .tm b{color:var(--sc)}
+.tx{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.d{overflow-wrap:anywhere}
+.du{flex:none;text-align:center;font-size:.7rem;color:var(--muted);line-height:1.3;min-width:3em;margin-top:2px}
+.du b{display:block;font-size:.92rem;color:var(--fg);font-variant-numeric:tabular-nums}
+.row:has(input:checked){opacity:.62}
+.row:has(input:checked) .d{text-decoration:line-through;text-decoration-color:var(--muted)}
+.ib{flex:none;border:0;background:none;color:var(--muted);cursor:pointer;padding:10px 10px;border-radius:10px;align-self:flex-start}
+.ib:hover{color:var(--accent)}
+.ib svg{width:18px;height:18px;display:block}
+.note{background:color-mix(in srgb,var(--accent) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));border-radius:12px;padding:9px 14px;font-size:.88rem}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;flex:1}
+.bar i{display:block;height:100%;background:var(--done);border-radius:6px}
+.pl{display:flex;align-items:center;gap:12px}
+.pl .n{font-size:.83rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.seg{display:flex;gap:6px;overflow-x:auto;padding:2px 1px 8px;scrollbar-width:thin}
+.seg button{flex:none;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:5px 13px;cursor:pointer;font-size:.86rem;line-height:1.5}
+.seg button small{display:block;color:var(--muted);font-size:.7rem}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg);font-weight:700}
+.seg button[aria-pressed="true"] small{color:inherit;opacity:.8}
+.seg button.today{border-color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent)}
+.wsel{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wsel select{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:5px 10px;min-width:0}
+.scard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:8px;text-align:right;cursor:pointer;border-top:5px solid var(--sc);min-width:0;width:100%}
+.scard b{font-size:1.05rem}
+.wk{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:13px 14px;display:grid;gap:7px;cursor:pointer;text-align:right;width:100%;min-width:0}
+.wk.cur{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.wk .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.badge{font-size:.72rem;font-weight:700;border-radius:8px;padding:0 8px;background:color-mix(in srgb,var(--c-ink) 16%,transparent);color:var(--c-ink);border:1px solid color-mix(in srgb,var(--c-ink) 35%,transparent)}
+.badge.n{background:color-mix(in srgb,var(--muted) 14%,transparent);color:var(--muted);border-color:var(--line)}
+details.day{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:0 14px}
+details.day>summary{cursor:pointer;padding:11px 0;display:flex;align-items:center;gap:12px;font-weight:700;list-style:none}
+details.day>summary::-webkit-details-marker{display:none}
+details.day[open]>summary{border-bottom:1px dashed var(--line);margin-bottom:10px}
+details.day .rows{padding-bottom:12px}
+.list li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);min-width:0}
+.list li:last-child{border:0}
+.list .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.list li.done .t{text-decoration:line-through;color:var(--muted)}
+.empty{padding:14px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px;font-size:.88rem}
+.hb{display:grid;grid-template-columns:7.5em 1fr auto;gap:10px;align-items:center;margin-bottom:8px;font-size:.86rem}
+.hb .t{height:11px;background:var(--line);border-radius:7px;overflow:hidden}
+.hb .t i{display:block;height:100%;border-radius:7px;background:var(--sc,var(--accent))}
+.hb .v{font-variant-numeric:tabular-nums;color:var(--muted);min-width:3.2em;text-align:left}
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--font);font-size:11px;fill:var(--muted)}
+.chart .gl{stroke:var(--line);stroke-width:1}
+.chart .ln{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.chart .pt{fill:var(--surface);stroke:var(--accent);stroke-width:2.5}
+.chart .bar-r{fill:var(--accent)}
+textarea,input[type=text],input[type=time],select.f,input.f{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:8px 11px;min-width:0}
+textarea{min-height:92px;resize:vertical}
+.ov{position:fixed;inset:0;z-index:50;background:rgba(8,12,24,.55);display:grid;place-items:center;padding:14px}
+.modal{background:var(--surface);color:var(--fg);border-radius:20px;max-width:520px;width:100%;max-height:92vh;overflow:auto;padding:18px;display:grid;gap:12px;border:1px solid var(--line)}
+.modal h2{font-size:1.1rem;font-weight:800}
+.fl{display:grid;gap:3px;font-size:.85rem;font-weight:700}
+.fl.r{grid-template-columns:1fr 1fr;gap:10px}.fl.r>div{display:grid;gap:3px}
+.fl span.h{font-weight:400;color:var(--muted);font-size:.76rem}
+.acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start}
+.radio{display:flex;gap:14px;flex-wrap:wrap;font-weight:500}
+.toast{position:fixed;inset-inline:0;bottom:calc(80px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;z-index:60;pointer-events:none}
+.toast div{background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:12px;font-size:.88rem;max-width:90vw}
+.sw{display:inline-flex;gap:4px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:3px}
+.sw button{border:0;background:none;padding:4px 12px;border-radius:9px;cursor:pointer;font-size:.84rem;color:var(--muted)}
+.sw button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);font-weight:700}
+.tabrow{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+@media (max-width:560px){.hb{grid-template-columns:6em 1fr auto}.du{display:none}.hero h1{font-size:1.75rem}.av{width:88px;height:88px}.fl.r{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bar-top"><div class="brand"><span class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M7 9.5V15c0 1.5 2.2 3 5 3s5-1.5 5-3V9.5"/></svg></span>برنامهٔ درسی هوشمند</div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end"><div class="acts" id="bk" hidden><button class="btn ghost sm" type="button" id="bkx">ذخیرهٔ پشتیبان</button><button class="btn ghost sm" type="button" id="bki">بازیابی پشتیبان</button><input type="file" id="bkf" accept="application/json,.json" hidden></div><div class="sync" id="sync"><i></i><span>در حال آماده‌سازی</span></div></div></div>
+  <div class="shell"><nav class="nav" id="nav" aria-label="منوی اصلی"></nav><main id="view"></main></div>
+</div>
+<div id="layer"></div><div class="toast" id="toast"></div>
+<script>
+(function(){
+'use strict';
+var TPL={"days": [{"id": "sat", "name": "شنبه", "school": "فیزیک، زیست، ریاضی", "online": "کلاس آنلاین فیزیک ۲۲:۰۰ تا ۲۳:۳۰", "rows": [{"id": "sat0", "t": "row", "s": "06:45", "e": "07:30", "subj": null, "text": "بیداری، صبحانه و آماده‌شدن", "kind": "rest", "mode": "both", "label": "صبح"}, {"id": "sat1", "t": "row", "s": "07:30", "e": "08:00", "subj": null, "text": "رفت‌وآمد به مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "sat2", "t": "row", "s": "08:00", "e": "13:00", "subj": null, "text": "مدرسه: فیزیک، زیست‌شناسی، ریاضی", "kind": "school", "mode": "both", "label": null}, {"id": "sat3", "t": "row", "s": "13:00", "e": "13:30", "subj": null, "text": "بازگشت از مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "sat4", "t": "row", "s": "13:30", "e": "14:15", "subj": null, "text": "ناهار", "kind": "meal", "mode": "both", "label": null}, {"id": "sat5", "t": "row", "s": "14:15", "e": "15:00", "subj": null, "text": "استراحت یا چرت کوتاه (حداکثر ۳۰ دقیقه) و تجدید انرژی", "kind": "rest", "mode": "both", "label": null}, {"id": "sat6", "t": "row", "s": "15:00", "e": "16:00", "subj": "bio", "text": "مرور درس امروز مدرسه: خواندن دقیق متن کتاب، شکل‌ها، قیدها و نمودارها؛ نوشتن ۵ نکتهٔ کلیدی", "kind": "study", "mode": "both", "label": null}, {"id": "sat8", "t": "row", "s": "16:15", "e": "17:15", "subj": "math", "text": "مرور درس امروز و حل حدود ۸ تمرین کتاب از مبحث امروز", "kind": "study", "mode": "both", "label": null}, {"id": "sat10", "t": "row", "s": "17:30", "e": "18:15", "subj": "phys", "text": "مرور درس امروز مدرسه و حل ۱۰ تست از مبحث تدریس‌شده", "kind": "study", "mode": "both", "label": null}, {"id": "sat11", "t": "row", "s": "18:15", "e": "19:15", "subj": null, "text": "شام و استراحت", "kind": "meal", "mode": "both", "label": null}, {"id": "sat12", "t": "row", "s": "19:15", "e": "19:35", "subj": "chem", "text": "پیش‌خوانی مختصر درس یکشنبه: خواندن سریع مبحث بعدی و علامت‌گذاری قسمت‌های مبهم", "kind": "study", "mode": "both", "label": null}, {"id": "sat13", "t": "row", "s": "19:35", "e": "19:55", "subj": "ar", "text": "پیش‌خوانی مختصر درس یکشنبه: متن و واژه‌های جدید", "kind": "study", "mode": "both", "label": null}, {"id": "sat14", "t": "row", "s": "19:55", "e": "20:40", "subj": null, "text": "وقت آزاد", "kind": "rest", "mode": "both", "label": "وقت آزاد"}, {"id": "sat15", "t": "row", "s": "20:40", "e": "21:30", "subj": "phys", "text": "آماده‌سازی کلاس: مرور تکلیف جلسهٔ دوشنبه و علامت‌گذاری سؤال‌های مشکل‌دار برای پرسیدن در کلاس", "kind": "study", "mode": "both", "label": null}, {"id": "sat16", "t": "row", "s": "21:30", "e": "21:55", "subj": null, "text": "میان‌وعده و آماده‌شدن برای کلاس", "kind": "rest", "mode": "both", "label": null}, {"id": "sat17", "t": "row", "s": "22:00", "e": "23:30", "subj": "phys", "text": "کلاس آنلاین فیزیک", "kind": "class", "mode": "both", "label": null}, {"id": "sat18", "t": "row", "s": "23:30", "e": "23:45", "subj": null, "text": "جمع‌کردن وسایل و آماده‌شدن برای خواب", "kind": "misc", "mode": "both", "label": null}, {"id": "sat19", "t": "row", "s": "23:45", "e": "06:45", "subj": null, "text": "خواب (امشب کلاس دیر تمام می‌شود؛ تکلیف سنگین فردا انجام می‌شود)", "kind": "sleep", "mode": "both", "label": null}]}, {"id": "sun", "name": "یکشنبه", "school": "ریاضی، شیمی، عربی", "online": "کلاس زبان ۱۴ تا ۱۵ · آنلاین زمین‌شناسی ۲۰:۱۵ تا ۲۱:۴۵", "rows": [{"id": "sun0", "t": "row", "s": "06:45", "e": "07:30", "subj": null, "text": "بیداری، صبحانه و آماده‌شدن", "kind": "rest", "mode": "both", "label": "صبح"}, {"id": "sun1", "t": "row", "s": "07:30", "e": "08:00", "subj": null, "text": "رفت‌وآمد به مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "sun2", "t": "row", "s": "08:00", "e": "13:00", "subj": null, "text": "مدرسه: ریاضی، شیمی، عربی", "kind": "school", "mode": "both", "label": null}, {"id": "sun3", "t": "row", "s": "13:00", "e": "13:30", "subj": null, "text": "بازگشت از مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "sun4", "t": "row", "s": "13:30", "e": "13:50", "subj": null, "text": "ناهار سریع", "kind": "meal", "mode": "both", "label": null}, {"id": "sun5", "t": "row", "s": "13:50", "e": "14:00", "subj": null, "text": "رفتن به کلاس زبان", "kind": "commute", "mode": "both", "label": null}, {"id": "sun6", "t": "row", "s": "14:00", "e": "15:00", "subj": "eng", "text": "کلاس زبان", "kind": "class", "mode": "both", "label": null}, {"id": "sun7", "t": "row", "s": "15:00", "e": "15:15", "subj": null, "text": "بازگشت از کلاس", "kind": "commute", "mode": "both", "label": null}, {"id": "sun8", "t": "row", "s": "15:15", "e": "15:45", "subj": null, "text": "استراحت و تجدید انرژی", "kind": "rest", "mode": "both", "label": null}, {"id": "sun9", "t": "row", "s": "15:45", "e": "16:45", "subj": "bio", "text": "مطالعهٔ مفهومی یک بخش از کتاب (حدود ۶ تا ۸ صفحه): شکل‌ها، جدول‌ها و مقایسه‌ها؛ در پایان خلاصهٔ ۱۰ خطی بنویس. تست ندارد", "kind": "study", "mode": "both", "label": null}, {"id": "sun11", "t": "row", "s": "17:00", "e": "17:45", "subj": "chem", "text": "مرور درس امروز مدرسه و حل ۱۰ تمرین و تست از مبحث امروز", "kind": "study", "mode": "both", "label": null}, {"id": "sun13", "t": "row", "s": "18:00", "e": "18:40", "subj": "math", "text": "مرور درس امروز مدرسه و حل ۸ تست از مبحث امروز", "kind": "study", "mode": "both", "label": null}, {"id": "sun14", "t": "row", "s": "18:40", "e": "19:40", "subj": null, "text": "شام و استراحت", "kind": "meal", "mode": "both", "label": null}, {"id": "sun15", "t": "row", "s": "19:40", "e": "20:10", "subj": "geo", "text": "آماده‌سازی کلاس: مرور جزوهٔ جلسهٔ قبل و بررسی تکلیف", "kind": "study", "mode": "both", "label": null}, {"id": "sun16", "t": "row", "s": "20:15", "e": "21:45", "subj": "geo", "text": "کلاس آنلاین زمین‌شناسی", "kind": "class", "mode": "both", "label": null}, {"id": "sun17", "t": "row", "s": "21:45", "e": "22:10", "subj": null, "text": "میان‌وعده و استراحت", "kind": "rest", "mode": "both", "label": null}, {"id": "sun18", "t": "row", "s": "22:10", "e": "22:35", "subj": "ar", "text": "مرور درس امروز مدرسه: ترجمه، قواعد و ۱۰ تمرین", "kind": "study", "mode": "both", "label": null}, {"id": "sun19", "t": "row", "s": "22:35", "e": "22:45", "subj": null, "text": "جمع‌کردن وسایل فردا و آماده‌شدن برای خواب", "kind": "misc", "mode": "both", "label": null}, {"id": "sun20", "t": "row", "s": "22:45", "e": "06:45", "subj": null, "text": "خواب", "kind": "sleep", "mode": "both", "label": null}]}, {"id": "mon", "name": "دوشنبه", "school": "شیمی، زیست‌شناسی، فیزیک", "online": "آنلاین فیزیک ۱۶:۴۵ تا ۱۸:۱۵ · شیمی ۲۰:۱۵ تا ۲۳:۱۵", "rows": [{"id": "mon0", "t": "row", "s": "06:45", "e": "07:30", "subj": null, "text": "بیداری، صبحانه و آماده‌شدن", "kind": "rest", "mode": "both", "label": "صبح"}, {"id": "mon1", "t": "row", "s": "07:30", "e": "08:00", "subj": null, "text": "رفت‌وآمد به مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "mon2", "t": "row", "s": "08:00", "e": "13:00", "subj": null, "text": "مدرسه: شیمی، زیست‌شناسی، فیزیک", "kind": "school", "mode": "both", "label": null}, {"id": "mon3", "t": "row", "s": "13:00", "e": "13:30", "subj": null, "text": "بازگشت از مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "mon4", "t": "row", "s": "13:30", "e": "14:10", "subj": null, "text": "ناهار", "kind": "meal", "mode": "both", "label": null}, {"id": "mon5", "t": "row", "s": "14:10", "e": "14:50", "subj": null, "text": "استراحت کوتاه", "kind": "rest", "mode": "both", "label": null}, {"id": "mon6", "t": "row", "s": "14:50", "e": "15:50", "subj": "phys", "text": "مرور درس امروز مدرسه و انجام تکلیف جلسهٔ شنبه (تست‌های تعیین‌شدهٔ مدرس)؛ ۱۰ دقیقهٔ آخر: علامت‌گذاری سؤال‌های مشکل‌دار", "kind": "study", "mode": "both", "label": null}, {"id": "mon7", "t": "row", "s": "15:50", "e": "16:40", "subj": null, "text": "میان‌وعده، استراحت و آماده‌شدن برای کلاس", "kind": "rest", "mode": "both", "label": null}, {"id": "mon8", "t": "row", "s": "16:45", "e": "18:15", "subj": "phys", "text": "کلاس آنلاین فیزیک", "kind": "class", "mode": "both", "label": null}, {"id": "mon9", "t": "row", "s": "18:15", "e": "19:00", "subj": null, "text": "شام", "kind": "meal", "mode": "both", "label": null}, {"id": "mon10", "t": "row", "s": "19:00", "e": "19:45", "subj": "chem", "text": "مرور درس امروز مدرسه و بررسی تکلیف جلسهٔ قبل پیش از کلاس", "kind": "study", "mode": "both", "label": null}, {"id": "mon11", "t": "row", "s": "19:45", "e": "20:10", "subj": "bio", "text": "مرور کوتاه زیست امروز با شکل‌ها و فلش‌کارت (بدون تست)", "kind": "study", "mode": "both", "label": null}, {"id": "mon12", "t": "row", "s": "20:15", "e": "23:15", "subj": "chem", "text": "کلاس آنلاین شیمی (۳ ساعت، با استراحت‌های میان کلاس)", "kind": "class", "mode": "both", "label": null}, {"id": "mon13", "t": "row", "s": "23:15", "e": "23:30", "subj": null, "text": "جمع‌کردن وسایل و آماده‌شدن برای خواب", "kind": "misc", "mode": "both", "label": null}, {"id": "mon14", "t": "row", "s": "23:30", "e": "06:45", "subj": null, "text": "خواب (تکلیف سنگین شیمی به فردا منتقل شده)", "kind": "sleep", "mode": "both", "label": null}]}, {"id": "tue", "name": "سه‌شنبه", "school": "زبان، زمین‌شناسی، فارسی، انسان و محیط‌زیست", "online": "کلاس زبان ۱۴ تا ۱۵ · بدون کلاس آنلاین", "rows": [{"id": "tue0", "t": "row", "s": "06:45", "e": "07:30", "subj": null, "text": "بیداری، صبحانه و آماده‌شدن", "kind": "rest", "mode": "both", "label": "صبح"}, {"id": "tue1", "t": "row", "s": "07:30", "e": "08:00", "subj": null, "text": "رفت‌وآمد به مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "tue2", "t": "row", "s": "08:00", "e": "13:00", "subj": null, "text": "مدرسه: زبان، زمین‌شناسی، فارسی، انسان و محیط‌زیست", "kind": "school", "mode": "both", "label": null}, {"id": "tue3", "t": "row", "s": "13:00", "e": "13:30", "subj": null, "text": "بازگشت از مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "tue4", "t": "row", "s": "13:30", "e": "13:50", "subj": null, "text": "ناهار سریع", "kind": "meal", "mode": "both", "label": null}, {"id": "tue5", "t": "row", "s": "13:50", "e": "14:00", "subj": null, "text": "رفتن به کلاس زبان", "kind": "commute", "mode": "both", "label": null}, {"id": "tue6", "t": "row", "s": "14:00", "e": "15:00", "subj": "eng", "text": "کلاس زبان", "kind": "class", "mode": "both", "label": null}, {"id": "tue7", "t": "row", "s": "15:00", "e": "15:15", "subj": null, "text": "بازگشت از کلاس", "kind": "commute", "mode": "both", "label": null}, {"id": "tue8", "t": "row", "s": "15:15", "e": "15:45", "subj": null, "text": "استراحت و تجدید انرژی", "kind": "rest", "mode": "both", "label": null}, {"id": "tue9", "t": "row", "s": "15:45", "e": "16:45", "subj": "chem", "text": "تکلیف جلسهٔ دوشنبه، بخش اول: تست‌های تعیین‌شدهٔ مدرس (حجم سنگین است و بین سه روز پخش شده)", "kind": "study", "mode": "both", "label": null}, {"id": "tue11", "t": "row", "s": "17:00", "e": "17:45", "subj": "bio", "text": "تست‌زنی ۲۰ تست از مبحث مطالعه‌شدهٔ یکشنبه، سپس بررسی پاسخ‌نامه و علامت‌گذاری غلط‌ها (جلسهٔ جدا از مطالعه)", "kind": "study", "mode": "both", "label": null}, {"id": "tue13", "t": "row", "s": "18:00", "e": "18:40", "subj": "geo", "text": "مرور درس امروز مدرسه و تکلیف جلسهٔ یکشنبه، بخش اول", "kind": "study", "mode": "both", "label": null}, {"id": "tue14", "t": "row", "s": "18:40", "e": "19:40", "subj": null, "text": "شام و استراحت", "kind": "meal", "mode": "both", "label": null}, {"id": "tue15", "t": "row", "s": "19:40", "e": "20:00", "subj": "fa", "text": "مرور درس امروز فارسی: لغات، آرایه‌ها و ۱۰ تست", "kind": "study", "mode": "both", "label": null}, {"id": "tue16", "t": "row", "s": "20:00", "e": "20:20", "subj": "env", "text": "مرور زبان مدرسه و انسان و محیط‌زیست: یادداشت‌های امروز", "kind": "study", "mode": "both", "label": null}, {"id": "tue18", "t": "row", "s": "20:40", "e": "21:25", "subj": "math", "text": "حل ۱۲ تست از مباحث شنبه و یکشنبه و شروع تکلیف جلسهٔ چهارشنبه", "kind": "study", "mode": "both", "label": null}, {"id": "tue19", "t": "row", "s": "21:25", "e": "22:30", "subj": null, "text": "وقت آزاد و استراحت", "kind": "rest", "mode": "both", "label": "وقت آزاد"}, {"id": "tue20", "t": "row", "s": "22:30", "e": "06:45", "subj": null, "text": "خواب (زودتر بخواب؛ چهارشنبه شب کلاس دیر تمام می‌شود)", "kind": "sleep", "mode": "both", "label": null}]}, {"id": "wed", "name": "چهارشنبه", "school": "دینی، تاریخ، ورزش", "online": "آنلاین ریاضی ۱۸:۳۰ تا ۲۰:۰۰ · زیست ۲۰:۱۵ تا ۲۳:۱۵", "rows": [{"id": "wed0", "t": "row", "s": "06:45", "e": "07:30", "subj": null, "text": "بیداری، صبحانه و آماده‌شدن", "kind": "rest", "mode": "both", "label": "صبح"}, {"id": "wed1", "t": "row", "s": "07:30", "e": "08:00", "subj": null, "text": "رفت‌وآمد به مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "wed2", "t": "row", "s": "08:00", "e": "13:00", "subj": null, "text": "مدرسه: دینی، تاریخ، ورزش", "kind": "school", "mode": "both", "label": null}, {"id": "wed3", "t": "row", "s": "13:00", "e": "13:30", "subj": null, "text": "بازگشت از مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "wed4", "t": "row", "s": "13:30", "e": "14:15", "subj": null, "text": "ناهار", "kind": "meal", "mode": "both", "label": null}, {"id": "wed5", "t": "row", "s": "14:15", "e": "15:00", "subj": null, "text": "استراحت یا چرت کوتاه (حداکثر ۳۰ دقیقه) و تجدید انرژی", "kind": "rest", "mode": "both", "label": null}, {"id": "wed6", "t": "row", "s": "15:00", "e": "15:25", "subj": "rel", "text": "مرور درس دینی امروز: خلاصه‌نویسی و ۸ تست", "kind": "study", "mode": "both", "label": null}, {"id": "wed7", "t": "row", "s": "15:25", "e": "15:50", "subj": "his", "text": "مرور درس تاریخ امروز: خلاصه‌نویسی و ۸ تست", "kind": "study", "mode": "both", "label": null}, {"id": "wed9", "t": "row", "s": "16:05", "e": "17:05", "subj": "bio", "text": "پیش‌مطالعهٔ کلاس امشب: خواندن بخش مربوط در کتاب، شکل‌ها و نکات؛ مرور تکلیف جلسهٔ قبل", "kind": "study", "mode": "both", "label": null}, {"id": "wed11", "t": "row", "s": "17:20", "e": "18:05", "subj": "math", "text": "آماده‌سازی کلاس: مرور مبحث جلسهٔ قبل، تکمیل تکلیف و علامت‌گذاری سؤال‌های مشکل‌دار", "kind": "study", "mode": "both", "label": null}, {"id": "wed12", "t": "row", "s": "18:05", "e": "18:30", "subj": null, "text": "شام سبک", "kind": "meal", "mode": "both", "label": null}, {"id": "wed13", "t": "row", "s": "18:30", "e": "20:00", "subj": "math", "text": "کلاس آنلاین ریاضی", "kind": "class", "mode": "both", "label": null}, {"id": "wed15", "t": "row", "s": "20:15", "e": "23:15", "subj": "bio", "text": "کلاس آنلاین زیست‌شناسی (۳ ساعت، با استراحت‌های میان کلاس)", "kind": "class", "mode": "both", "label": null}, {"id": "wed16", "t": "row", "s": "23:15", "e": "23:30", "subj": null, "text": "جمع‌کردن وسایل و آماده‌شدن برای خواب", "kind": "misc", "mode": "both", "label": null}, {"id": "wed17", "t": "row", "s": "23:30", "e": "06:45", "subj": null, "text": "خواب (تکلیف سنگین زیست به فردا منتقل شده)", "kind": "sleep", "mode": "both", "label": null}]}, {"id": "thu", "name": "پنجشنبه", "school": "شیمی، ریاضی، فیزیک", "online": "بدون کلاس آنلاین", "rows": [{"id": "thu0", "t": "row", "s": "06:45", "e": "07:30", "subj": null, "text": "بیداری، صبحانه و آماده‌شدن", "kind": "rest", "mode": "both", "label": "صبح"}, {"id": "thu1", "t": "row", "s": "07:30", "e": "08:00", "subj": null, "text": "رفت‌وآمد به مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "thu2", "t": "row", "s": "08:00", "e": "13:00", "subj": null, "text": "مدرسه: شیمی، ریاضی، فیزیک", "kind": "school", "mode": "both", "label": null}, {"id": "thu3", "t": "row", "s": "13:00", "e": "13:30", "subj": null, "text": "بازگشت از مدرسه", "kind": "commute", "mode": "both", "label": null}, {"id": "thu4", "t": "row", "s": "13:30", "e": "14:15", "subj": null, "text": "ناهار", "kind": "meal", "mode": "both", "label": null}, {"id": "thu5", "t": "row", "s": "14:15", "e": "15:00", "subj": null, "text": "استراحت یا چرت کوتاه (حداکثر ۳۰ دقیقه) و تجدید انرژی", "kind": "rest", "mode": "both", "label": null}, {"id": "thu6", "t": "row", "s": "15:00", "e": "16:00", "subj": "bio", "text": "تکلیف جلسهٔ چهارشنبه، بخش اول: بازخوانی مبحث کلاس، تست‌های تعیین‌شده و بررسی پاسخ‌ها", "kind": "study", "mode": "both", "label": null}, {"id": "thu8", "t": "row", "s": "16:15", "e": "17:15", "subj": "chem", "text": "مرور درس امروز مدرسه (۲۰ دقیقه) و ادامهٔ تکلیف جلسهٔ دوشنبه (۴۰ دقیقه)", "kind": "study", "mode": "both", "label": null}, {"id": "thu10", "t": "row", "s": "17:30", "e": "18:15", "subj": "math", "text": "مرور درس امروز مدرسه (۱۵ دقیقه) و تکلیف جلسهٔ چهارشنبه (۳۰ دقیقه)", "kind": "study", "mode": "both", "label": null}, {"id": "thu12", "t": "row", "s": "18:30", "e": "19:15", "subj": "phys", "text": "مرور درس امروز مدرسه (۱۵ دقیقه) و تکلیف جلسهٔ دوشنبه (۳۰ دقیقه)", "kind": "study", "mode": "both", "label": null}, {"id": "thu13", "t": "row", "s": "19:15", "e": "20:15", "subj": null, "text": "شام و استراحت", "kind": "meal", "mode": "both", "label": null}, {"id": "thu14", "t": "note", "text": "هفتهٔ آزمون ماز: امشب سبک‌تر است. مطلب جدید شروع نکن و کمی زودتر بخواب.", "mode": "maz", "s": "00:00", "e": "00:00"}, {"id": "thu15", "t": "row", "s": "20:15", "e": "21:15", "subj": "maz", "text": "مرور خلاصهٔ نکات و فرمول‌های همهٔ درس‌ها و حل ۲۰ تست ترکیبی سبک؛ بدون مطلب جدید", "kind": "study", "mode": "maz", "label": null}, {"id": "thu16", "t": "row", "s": "21:15", "e": "22:30", "subj": null, "text": "استراحت کامل؛ مرور سنگین ممنوع", "kind": "rest", "mode": "maz", "label": "استراحت"}, {"id": "thu17", "t": "row", "s": "20:15", "e": "21:00", "subj": "geo", "text": "مطالعهٔ یک بخش از کتاب زمین‌شناسی و حل ۱۰ تست", "kind": "study", "mode": "no", "label": null}, {"id": "thu18", "t": "row", "s": "21:00", "e": "22:30", "subj": null, "text": "وقت آزاد و استراحت", "kind": "rest", "mode": "no", "label": "وقت آزاد"}, {"id": "thu19", "t": "row", "s": "22:30", "e": "07:00", "subj": null, "text": "خواب", "kind": "sleep", "mode": "both", "label": null}]}, {"id": "fri", "name": "جمعه", "school": "آزمون جامع ماز یک هفته در میان", "online": "بدون کلاس آنلاین ثابت", "rows": [{"id": "fri0", "t": "note", "text": "جمعهٔ بدون آزمون ماز: روز جبران عقب‌ماندگی، مرور هفتگی و آماده‌سازی هفتهٔ بعد.", "mode": "no", "s": "00:00", "e": "00:00"}, {"id": "fri1", "t": "note", "text": "جمعهٔ آزمون ماز: ساعت آزمون طبق اعلام ماز است. اگر ساعتش با این برنامه فرق دارد، بقیهٔ برنامه را به همان اندازه جابه‌جا کن.", "mode": "maz", "s": "00:00", "e": "00:00"}, {"id": "fri2", "t": "row", "s": "07:00", "e": "07:45", "subj": null, "text": "بیداری، صبحانه و آماده‌شدن", "kind": "rest", "mode": "no", "label": "صبح"}, {"id": "fri3", "t": "row", "s": "07:45", "e": "08:45", "subj": "bio", "text": "مرور هفتگی: متن کتاب، شکل‌ها، قیدها و فلش‌کارت‌های جلسه‌های این هفته", "kind": "study", "mode": "no", "label": null}, {"id": "fri5", "t": "row", "s": "09:00", "e": "10:00", "subj": "phys", "text": "تکمیل تکلیف جلسهٔ دوشنبه و ۱۵ تست مرور فیزیک", "kind": "study", "mode": "no", "label": null}, {"id": "fri7", "t": "row", "s": "10:15", "e": "11:00", "subj": "bio", "text": "تست‌زنی ۲۰ تست از مباحث هفته (جلسهٔ جدا از مرور) و بررسی پاسخ‌ها", "kind": "study", "mode": "no", "label": null}, {"id": "fri9", "t": "row", "s": "11:15", "e": "12:00", "subj": "math", "text": "تکمیل تکلیف جلسهٔ چهارشنبه و مرور نمونه‌سؤال‌های هفته", "kind": "study", "mode": "no", "label": null}, {"id": "fri10", "t": "row", "s": "12:00", "e": "13:15", "subj": null, "text": "ناهار و استراحت", "kind": "meal", "mode": "no", "label": null}, {"id": "fri11", "t": "row", "s": "13:15", "e": "14:30", "subj": null, "text": "وقت آزاد و خانواده", "kind": "rest", "mode": "no", "label": "وقت آزاد"}, {"id": "fri12", "t": "row", "s": "14:30", "e": "15:15", "subj": "geo", "text": "تکلیف جلسهٔ یکشنبه، بخش دوم و مرور", "kind": "study", "mode": "no", "label": null}, {"id": "fri14", "t": "row", "s": "15:30", "e": "16:15", "subj": "chem", "text": "تکمیل تکلیف جلسهٔ دوشنبه و رفع اشکال سؤال‌های علامت‌دار", "kind": "study", "mode": "no", "label": null}, {"id": "fri16", "t": "row", "s": "16:30", "e": "17:15", "subj": "fix", "text": "رفع اشکال هفته: بازگشت به همهٔ سؤال‌های علامت‌دار (هر درس ۱۰ دقیقه)", "kind": "study", "mode": "no", "label": null}, {"id": "fri17", "t": "row", "s": "17:15", "e": "18:30", "subj": null, "text": "وقت آزاد", "kind": "rest", "mode": "no", "label": "وقت آزاد"}, {"id": "fri18", "t": "row", "s": "18:30", "e": "19:15", "subj": null, "text": "شام", "kind": "meal", "mode": "no", "label": null}, {"id": "fri19", "t": "row", "s": "19:15", "e": "19:45", "subj": "plan", "text": "برنامه‌ریزی هفتهٔ بعد: ثبت امتحان‌ها و تکالیف جدید، آماده‌کردن کیف و کتاب‌ها", "kind": "study", "mode": "no", "label": null}, {"id": "fri20", "t": "row", "s": "19:45", "e": "22:30", "subj": null, "text": "وقت آزاد و استراحت", "kind": "rest", "mode": "no", "label": "وقت آزاد"}, {"id": "fri21", "t": "row", "s": "07:00", "e": "08:00", "subj": null, "text": "بیداری، صبحانه و آماده‌شدن برای آزمون", "kind": "rest", "mode": "maz", "label": "صبح"}, {"id": "fri22", "t": "row", "s": "08:00", "e": "08:30", "subj": "maz", "text": "مرور سبک خلاصهٔ نکات و فرمول‌ها (بدون مطلب جدید)", "kind": "study", "mode": "maz", "label": null}, {"id": "fri23", "t": "row", "s": "08:30", "e": "09:00", "subj": null, "text": "آماده‌کردن وسایل آزمون، آب و میان‌وعده", "kind": "misc", "mode": "maz", "label": null}, {"id": "fri24", "t": "row", "s": "09:00", "e": "12:00", "subj": "maz", "text": "آزمون جامع ماز", "kind": "class", "mode": "maz", "label": null}, {"id": "fri25", "t": "row", "s": "12:00", "e": "13:00", "subj": null, "text": "ناهار و استراحت کامل", "kind": "meal", "mode": "maz", "label": null}, {"id": "fri26", "t": "row", "s": "13:00", "e": "14:00", "subj": null, "text": "وقت آزاد بدون مطالعه", "kind": "rest", "mode": "maz", "label": "وقت آزاد"}, {"id": "fri27", "t": "row", "s": "14:00", "e": "15:00", "subj": "maz", "text": "تحلیل آزمون (۱): بررسی همهٔ غلط‌ها و نزده‌ها و نوشتن علت هر خطا: ندانستن، بی‌دقتی یا کمبود زمان", "kind": "study", "mode": "maz", "label": null}, {"id": "fri29", "t": "row", "s": "15:15", "e": "16:15", "subj": "maz", "text": "تحلیل آزمون (۲): شک‌دارها و بازخوانی مباحث فراموش‌شده؛ اولویت با زیست و درسی که بیشترین غلط را دارد", "kind": "study", "mode": "maz", "label": null}, {"id": "fri31", "t": "row", "s": "16:30", "e": "17:15", "subj": "bio", "text": "تکلیف جلسهٔ چهارشنبه، بخش دوم و مرور شکل‌ها", "kind": "study", "mode": "maz", "label": null}, {"id": "fri33", "t": "row", "s": "17:30", "e": "18:15", "subj": "geo", "text": "تکلیف جلسهٔ یکشنبه، بخش دوم", "kind": "study", "mode": "maz", "label": null}, {"id": "fri34", "t": "row", "s": "18:15", "e": "19:15", "subj": null, "text": "وقت آزاد و خانواده", "kind": "rest", "mode": "maz", "label": "وقت آزاد"}, {"id": "fri35", "t": "row", "s": "19:15", "e": "20:00", "subj": null, "text": "شام", "kind": "meal", "mode": "maz", "label": null}, {"id": "fri36", "t": "row", "s": "20:00", "e": "20:30", "subj": "plan", "text": "برنامه‌ریزی هفتهٔ بعد: ثبت امتحان‌ها و تکالیف جدید، آماده‌کردن کیف و کتاب‌ها", "kind": "study", "mode": "maz", "label": null}, {"id": "fri37", "t": "row", "s": "20:30", "e": "22:30", "subj": null, "text": "وقت آزاد و استراحت", "kind": "rest", "mode": "maz", "label": "وقت آزاد"}, {"id": "fri38", "t": "row", "s": "22:30", "e": "06:45", "subj": null, "text": "خواب", "kind": "sleep", "mode": "both", "label": null}]}]};
+var FAD='۰۱۲۳۴۵۶۷۸۹';
+function fa(n){return String(n).replace(/\d/g,function(d){return FAD[d]})}
+function norm(s){return String(s==null?'':s).replace(/[۰-۹]/g,function(d){return FAD.indexOf(d)}).replace(/[٠-٩]/g,function(d){return d.charCodeAt(0)-1632}).replace(/[٫،,]/g,'.').trim()}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+var SUBJ={phys:'فیزیک',chem:'شیمی',bio:'زیست‌شناسی',math:'ریاضی',geo:'زمین‌شناسی',eng:'زبان',ar:'عربی',fa:'فارسی',rel:'دینی',his:'تاریخ',env:'انسان و محیط‌زیست',pe:'ورزش'};
+var SKEYS=['bio','phys','chem','math','geo','eng','ar','fa','rel','his','env'];
+var EXTRA={maz:'ماز',fix:'رفع اشکال',plan:'برنامه‌ریزی',all:'کلی'};
+function NAME(s){return SUBJ[s]||EXTRA[s]||''}
+function CLR(s){var k=(s==='fix'||s==='plan'||s==='maz'||s==='all')?'ink':(s||'none');return 'var(--c-'+k+')'}
+var KINDS={study:'مطالعه',class:'کلاس',rest:'استراحت',meal:'غذا',commute:'رفت‌وآمد',sleep:'خواب',misc:'کار شخصی',school:'مدرسه'};
+var KLAB={rest:'استراحت',meal:'غذا',commute:'رفت‌وآمد',school:'مدرسه',sleep:'خواب',misc:'کار شخصی'};
+var SCHOOL={sat:['phys','bio','math'],sun:['math','chem','ar'],mon:['chem','bio','phys'],tue:['eng','geo','fa','env'],wed:['rel','his','pe'],thu:['chem','math','phys']};
+var DAYIDS=TPL.days.map(function(d){return d.id});
+var DNAME={};TPL.days.forEach(function(d){DNAME[d.id]=d.name});
+var GTYPES={school:'امتحان مدرسه',maz:'آزمون ماز',quiz:'کوییز یا میان‌ترم',other:'سایر'};
+var OFFLINE=true;
+var KEY='sp11app:state';
+var DEF={name:'کیانا صمدی',grade:'یازدهم',field:'علوم تجربی',school:'دبیرستان شهید فاتح نقشبندی',photo:''};
+function prof(){var o={},k;for(k in DEF)o[k]=DEF[k];for(k in S.profile)if(S.profile[k]!==undefined&&S.profile[k]!==null)o[k]=S.profile[k];return o}
+
+/* ---------- state ---------- */
+var S={profile:{grade:'یازدهم',field:'علوم تجربی'},config:{weekCount:17,startISO:'2026-11-21',edits:{},hidden:{},extra:[]},grades:[],weeks:{}};
+var hadLocal=false;
+try{var raw=localStorage.getItem(KEY);if(raw){var L=JSON.parse(raw);if(L&&L.config){S=L;hadLocal=true}}}catch(e){}
+S.profile=S.profile||{};S.config.edits=S.config.edits||{};S.config.hidden=S.config.hidden||{};S.config.extra=S.config.extra||[];
+var ui={page:'dashboard',wk:null,day:null,sub:'bio',openWeek:null,modal:false};
+var db=null,dirty={},flushing=false,flushT=null,warned=false;
+
+function W(k){var w=S.weeks[k];if(!w){w=S.weeks[k]={ticks:{},exams:[],hw:[],notes:'',edits:{},hidden:{},extra:[]}}
+  w.ticks=w.ticks||{};w.exams=w.exams||[];w.hw=w.hw||[];w.edits=w.edits||{};w.hidden=w.hidden||{};w.extra=w.extra||[];if(w.notes==null)w.notes='';return w}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function mark(path){dirty[path]=1;saveLocal();clearTimeout(flushT);flushT=setTimeout(flush,700)}
+function touchW(k){mark('weeks/w'+k)}
+function docData(path){
+  if(path==='app/profile')return S.profile;
+  if(path==='app/config')return S.config;
+  if(path==='app/grades')return {items:S.grades};
+  var k=+path.split('/w')[1];return W(k)}
+async function flush(){
+  if(!db||flushing)return;flushing=true;
+  try{var paths=Object.keys(dirty);
+    for(var i=0;i<paths.length;i++){var p=paths[i];delete dirty[p];
+      try{await db.doc(p).set(JSON.parse(JSON.stringify(docData(p))))}
+      catch(e){dirty[p]=1;if(!warned){warned=true;toast('ذخیرهٔ مشترک انجام نشد؛ فعلاً فقط روی این دستگاه ذخیره می‌شود.')}}}
+  }finally{flushing=false;if(Object.keys(dirty).length&&!warned){flushT=setTimeout(flush,1500)}}}
+function setSync(on){if(OFFLINE){var e0=document.getElementById('sync');e0.className='sync on';e0.lastChild.textContent='نسخهٔ آفلاین · ذخیره روی همین کامپیوتر';return}
+  var el=document.getElementById('sync');el.className='sync'+(on?' on':'');el.lastChild.textContent=on?'ذخیرهٔ مشترک فعال':'ذخیره فقط روی این دستگاه'}
+function toast(t){var el=document.getElementById('toast');el.innerHTML='<div>'+esc(t)+'</div>';clearTimeout(toast.t);toast.t=setTimeout(function(){el.innerHTML=''},3500)}
+function busy(){var a=document.activeElement;return ui.modal||(a&&(a.tagName==='TEXTAREA'||a.tagName==='INPUT'&&a.type==='text'))}
+var pendingRender=false;
+function remoteChanged(){saveLocal();if(busy()){pendingRender=true}else render()}
+async function initDb(){
+  try{if(!window.claude||!window.claude.use){setSync(false);return}
+    db=await window.claude.use('db')}catch(e){db=null}
+  if(!db){setSync(false);return}
+  setSync(true);var firstApp=true;
+  db.collection('app').onSnapshot(function(snap){
+    var ids={};snap.docs.forEach(function(d){ids[d.id]=1;if(d.metadata.hasPendingWrites||dirty['app/'+d.id])return;var v=d.data()||{};
+      if(d.id==='profile')S.profile=v;
+      else if(d.id==='config'){S.config=Object.assign({weekCount:17,startISO:'2026-11-21',edits:{},hidden:{},extra:[]},v);S.config.edits=S.config.edits||{};S.config.hidden=S.config.hidden||{};S.config.extra=S.config.extra||[]}
+      else if(d.id==='grades')S.grades=v.items||[]});
+    if(firstApp&&!snap.metadata.fromCache){firstApp=false;
+      if(!ids.config&&hadLocal){['app/profile','app/config','app/grades'].forEach(function(p){dirty[p]=1});Object.keys(S.weeks).forEach(function(k){dirty['weeks/w'+k]=1});flush()}}
+    remoteChanged()},function(){setSync(false)});
+  db.collection('weeks').onSnapshot(function(snap){
+    snap.docs.forEach(function(d){if(d.metadata.hasPendingWrites||dirty['weeks/'+d.id])return;var k=+d.id.slice(1);if(k)S.weeks[k]=d.data()||{}});
+    remoteChanged()},function(){});
+}
+
+/* ---------- dates ---------- */
+function startD(){var p=S.config.startISO.split('-').map(Number);return new Date(p[0],p[1]-1,p[2])}
+function dayDate(k,i){var s=startD();return new Date(s.getFullYear(),s.getMonth(),s.getDate()+7*(k-1)+i)}
+function today0(){var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())}
+function diff(a,b){return Math.round((a-b)/864e5)}
+var JF=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{day:'numeric',month:'long'});
+var JFY=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{year:'numeric',month:'long',day:'numeric'});
+function jd(d){try{return JF.format(d)}catch(e){return fa(d.getMonth()+1)+'/'+fa(d.getDate())}}
+function jdy(d){try{return JFY.format(d)}catch(e){return jd(d)}}
+function weekRange(k){return jd(dayDate(k,0))+' تا '+jd(dayDate(k,6))}
+function curWeek(){var n=Math.floor(diff(today0(),startD())/7)+1;return Math.max(1,Math.min(S.config.weekCount,n))}
+function todayIdx(){var d=diff(today0(),startD());if(d<0||d>=7*S.config.weekCount)return null;return d%7}
+function todayWeekReal(){var d=diff(today0(),startD());return d<0||d>=7*S.config.weekCount?null:Math.floor(d/7)+1}
+function isMaz(k){var w=W(k);return w.maz==null?(k%2===0):!!w.maz}
+
+/* ---------- rows ---------- */
+function mn(t){var p=t.split(':');return +p[0]*60+ +p[1]}
+function dur(s,e){var d=(mn(e)-mn(s)+1440)%1440;return d}
+function rowsFor(k,dayId){
+  var day=TPL.days.filter(function(d){return d.id===dayId})[0],w=W(k),c=S.config,maz=isMaz(k),out=[];
+  day.rows.forEach(function(r,i){
+    if(r.mode!=='both'&&r.mode!==(maz?'maz':'no'))return;
+    if(r.t==='row'&&(c.hidden[r.id]||w.hidden[r.id]))return;
+    var x=Object.assign({},r,c.edits[r.id]||{},w.edits[r.id]||{});x.base=true;x.ix=i;out.push(x)});
+  (c.extra||[]).filter(function(e){return e.day===dayId}).forEach(function(e){out.push(Object.assign({t:'row',mode:'both',kind:'study',scope:'all',base:false},e))});
+  (w.extra||[]).filter(function(e){return e.day===dayId}).forEach(function(e){out.push(Object.assign({t:'row',mode:'both',kind:'study',scope:'week',base:false},e))});
+  out.forEach(function(r,i){r.k=r.t==='note'?-1:mn(r.s);r.o=i});
+  out.sort(function(a,b){return a.k-b.k||a.o-b.o});return out}
+function acad(r){return r.t==='row'&&(r.kind==='study'||r.kind==='class')}
+function tickOf(k,id){return !!W(k).ticks[id]}
+function dayProg(k,dayId,onlyAcad){var rs=rowsFor(k,dayId).filter(function(r){return r.t==='row'&&(!onlyAcad||acad(r))});
+  var done=rs.filter(function(r){return tickOf(k,r.id)}).length;return {done:done,total:rs.length,pc:rs.length?Math.round(done*100/rs.length):0}}
+function weekProg(k,onlyAcad){var d=0,t=0,m=0,pm=0;DAYIDS.forEach(function(id){rowsFor(k,id).forEach(function(r){if(r.t!=='row'||(onlyAcad&&!acad(r)))return;t++;pm+=dur(r.s,r.e);if(tickOf(k,r.id)){d++;m+=dur(r.s,r.e)}})});
+  return {done:d,total:t,pc:t?Math.round(d*100/t):0,mins:m,planned:pm}}
+function allAcadWeeks(upTo){var r=[];for(var k=1;k<=upTo;k++)r.push(k);return r}
+function subjStats(s,upTo){var d=0,t=0,m=0,pm=0;allAcadWeeks(upTo).forEach(function(k){DAYIDS.forEach(function(id){rowsFor(k,id).forEach(function(r){if(!acad(r)||r.subj!==s)return;t++;pm+=dur(r.s,r.e);if(tickOf(k,r.id)){d++;m+=dur(r.s,r.e)}})})});
+  return {done:d,total:t,pc:t?Math.round(d*100/t):0,mins:m,planned:pm}}
+function hrs(m){var h=Math.floor(m/60),r=m%60;return h?fa(h)+' ساعت'+(r?' و '+fa(r)+' دقیقه':''):fa(r)+' دقیقه'}
+
+/* ---------- exams, homework, grades ---------- */
+function examsAll(){var out=[],t0=today0();
+  for(var k=1;k<=S.config.weekCount;k++){var w=W(k);
+    (w.exams||[]).forEach(function(e){var d=dayDate(k,e.day);out.push({id:e.id,k:k,day:e.day,date:d,du:diff(d,t0),subj:e.subj,time:e.time,topic:e.topic,auto:false})});
+    if(isMaz(k)){var d2=dayDate(k,6);out.push({id:'maz'+k,k:k,day:6,date:d2,du:diff(d2,t0),subj:'maz',time:'',topic:'',auto:true})}}
+  out.sort(function(a,b){return a.date-b.date});return out}
+function examTitle(e){return e.subj==='maz'&&e.auto?'آزمون جامع ماز':(e.subj==='all'?'':'امتحان ')+NAME(e.subj)+(e.topic?' · '+e.topic:'')}
+function hwAll(){var out=[],t0=today0();for(var k=1;k<=S.config.weekCount;k++){(W(k).hw||[]).forEach(function(h){var d=dayDate(k,h.day);out.push({id:h.id,k:k,day:h.day,date:d,du:diff(d,t0),subj:h.subj,text:h.text,done:!!h.done})})}out.sort(function(a,b){return a.date-b.date});return out}
+function pctOf(g){return g.max>0?Math.max(0,Math.min(100,g.score*100/g.max)):0}
+function gsorted(){return S.grades.slice().sort(function(a,b){return (a.wk*10+a.day)-(b.wk*10+b.day)})}
+function avgOf(list){return list.length?list.reduce(function(s,g){return s+pctOf(g)},0)/list.length:null}
+function p0(x){return fa(Math.round(x))+'٪'}
+
+/* ---------- ui bits ---------- */
+var IC={
+ home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/>',
+ cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+ book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+ weeks:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+ star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+ chart:'<path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/>',
+ edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>'
+};
+function icon(n,w){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'+(w?' width="'+w+'" height="'+w+'"':'')+'>'+IC[n]+'</svg>'}
+var PAGES=[['dashboard','داشبورد','home'],['days','ایام هفته','cal'],['subjects','درس‌ها','book'],['weeks','هفته‌ها','weeks'],['grades','نمرات','star'],['stats','آمار','chart']];
+function ring(pc,label,sub,col){var r=38,c=2*Math.PI*r;return '<div class="tile"><svg class="ring" viewBox="0 0 100 100" role="img" aria-label="'+esc(label)+' '+p0(pc)+'"><circle cx="50" cy="50" r="'+r+'" fill="none" stroke="var(--line)" stroke-width="10"/><circle cx="50" cy="50" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+(c*pc/100).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 50 50)"/><text x="50" y="57" text-anchor="middle" font-size="20">'+(pc==null?'—':p0(pc))+'</text></svg><div class="lab">'+label+'</div><div class="sub">'+sub+'</div></div>'}
+function pill(s,label){return '<span class="pill" style="--sc:'+CLR(s)+'">'+esc(label||NAME(s))+'</span>'}
+function pbar(pc,txt){return '<div class="pl"><div class="bar"><i style="width:'+pc+'%"></i></div><span class="n">'+txt+'</span></div>'}
+function rowHtml(k,r,ctx){
+  if(r.t==='note')return '<li class="note">'+esc(r.text)+'</li>';
+  var lab=r.label||(r.subj?(SUBJ[r.subj]||EXTRA[r.subj]):KLAB[r.kind]||''),m=dur(r.s,r.e),minor=['commute','meal','rest','sleep','misc','school'].indexOf(r.kind)>=0?' minor':'';
+  var du=m<120?'<b>'+fa(m)+'</b>دقیقه':'<b>'+fa(Math.floor(m/60)+(m%60?':'+('0'+m%60).slice(-2):''))+'</b>ساعت';
+  return '<li class="row k-'+r.kind+minor+'" style="--sc:'+CLR(r.subj)+'"><label><input type="checkbox" data-tick="1" data-wk="'+k+'" data-id="'+esc(r.id)+'"'+(tickOf(k,r.id)?' checked':'')+'><span class="chk" aria-hidden="true"></span><span class="tm"><b>'+fa(r.s)+'</b><span>'+fa(r.e)+'</span></span><span class="tx">'+pill(r.subj,lab)+'<span class="d">'+esc(r.text)+'</span></span><span class="du">'+du+'</span></label><button class="ib" data-act="editrow" data-wk="'+k+'" data-day="'+(ctx||'')+'" data-id="'+esc(r.id)+'" aria-label="ویرایش">'+icon('edit')+'</button></li>'}
+function dayRows(k,dayId){var rs=rowsFor(k,dayId);return '<ol class="rows">'+rs.map(function(r){return rowHtml(k,r,dayId)}).join('')+'</ol>'}
+function weekSel(k,sel){var o='';for(var i=1;i<=S.config.weekCount;i++)o+='<option value="'+i+'"'+(i===k?' selected':'')+'>هفتهٔ '+fa(i)+' · '+weekRange(i)+'</option>';
+  return '<div class="wsel"><button class="btn ghost sm" data-act="wkprev" aria-label="هفتهٔ قبل">‹ قبل</button><select data-sel="wk" aria-label="انتخاب هفته">'+o+'</select><button class="btn ghost sm" data-act="wknext" aria-label="هفتهٔ بعد">بعد ›</button>'+(isMaz(k)?'<span class="badge">هفتهٔ ماز</span>':'')+'</div>'}
+function subjOpts(sel,withAll,withNone){var o=withNone?'<option value="">بدون درس</option>':'';SKEYS.concat(['pe']).forEach(function(s){o+='<option value="'+s+'"'+(s===sel?' selected':'')+'>'+SUBJ[s]+'</option>'});
+  if(withAll)o+='<option value="all"'+(sel==='all'?' selected':'')+'>کلی (همهٔ درس‌ها)</option>';return o}
+function daySel(sel){return DAYIDS.map(function(id,i){return '<option value="'+i+'"'+(i===sel?' selected':'')+'>'+DNAME[id]+'</option>'}).join('')}
+function weekOpts(sel){var o='';for(var i=1;i<=S.config.weekCount;i++)o+='<option value="'+i+'"'+(i===sel?' selected':'')+'>هفتهٔ '+fa(i)+' · '+weekRange(i)+'</option>';return o}
+
+/* ---------- charts ---------- */
+function lineChart(pts,opt){
+  if(!pts.length)return '<div class="empty">هنوز دادهٔ کافی نیست.</div>';
+  var Wd=640,H=230,L=40,R=14,T=14,B=34,iw=Wd-L-R,ih=H-T-B,g='',n=pts.length;
+  [0,25,50,75,100].forEach(function(v){var y=T+ih-ih*v/100;g+='<line class="gl" x1="'+L+'" x2="'+(Wd-R)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(L-6)+'" y="'+(y+4)+'" text-anchor="end">'+fa(v)+'</text>'});
+  var xs=pts.map(function(p,i){return L+(n===1?iw/2:iw*i/(n-1))}),ys=pts.map(function(p){return T+ih-ih*p.y/100});
+  var path=xs.map(function(x,i){return (i?'L':'M')+x.toFixed(1)+' '+ys[i].toFixed(1)}).join(' ');
+  var step=Math.ceil(n/8),dots='',lab='';
+  pts.forEach(function(p,i){dots+='<circle class="pt" cx="'+xs[i].toFixed(1)+'" cy="'+ys[i].toFixed(1)+'" r="4.5"><title>'+esc(p.t)+'</title></circle>';
+    if(i%step===0||i===n-1)lab+='<text x="'+xs[i].toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle">'+esc(p.x)+'</text>'});
+  return '<svg class="chart" viewBox="0 0 '+Wd+' '+H+'" role="img" aria-label="'+esc(opt.label)+'">'+g+'<path class="ln" d="'+path+'"/>'+dots+lab+'</svg>'}
+function barChart(items,label){
+  if(!items.length)return '<div class="empty">هنوز دادهٔ کافی نیست.</div>';
+  var Wd=640,H=220,L=40,R=10,T=12,B=30,iw=Wd-L-R,ih=H-T-B,n=items.length,bw=Math.min(34,iw/n*0.62),g='',b='';
+  [0,50,100].forEach(function(v){var y=T+ih-ih*v/100;g+='<line class="gl" x1="'+L+'" x2="'+(Wd-R)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(L-6)+'" y="'+(y+4)+'" text-anchor="end">'+fa(v)+'</text>'});
+  items.forEach(function(it,i){var cx=L+iw*(i+.5)/n,h=ih*it.v/100;b+='<rect class="bar-r" x="'+(cx-bw/2).toFixed(1)+'" y="'+(T+ih-h).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(h,1.5).toFixed(1)+'" rx="5" style="fill:'+(it.c||'var(--accent)')+'"><title>'+esc(it.t)+'</title></rect><text x="'+cx.toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle">'+esc(it.x)+'</text>'});
+  return '<svg class="chart" viewBox="0 0 '+Wd+' '+H+'" role="img" aria-label="'+esc(label)+'">'+g+b+'</svg>'}
+
+/* ---------- pages ---------- */
+function examCard(e){var cls=e.du<=0?'a0':e.du===1?'a1':e.du===2?'a2':'a3';
+  var msg=e.du===0?'امروز':e.du===1?'فردا':e.du===2?'پس‌فردا':fa(e.du)+' روز دیگر';
+  return '<div class="alert '+cls+'"><div class="big">'+(e.du<=2?'!':fa(e.du))+'</div><div><b>'+msg+' '+esc(examTitle(e))+'</b><div class="small muted">'+DNAME[DAYIDS[e.day]]+' '+jd(e.date)+(e.time?' · ساعت '+fa(e.time):'')+' · هفتهٔ '+fa(e.k)+'</div></div></div>'}
+function pDashboard(){
+  var P=prof(),k=curWeek(),ti=todayIdx(),tw=todayWeekReal(),now=today0();
+  var nm=P.name?esc(P.name):'نام دانش‌آموز را وارد کن';
+  var line=[P.grade?'پایهٔ '+esc(P.grade):'',P.field?esc(P.field):'',P.school?esc(P.school):'',P.city?esc(P.city):'',P['class']?'کلاس '+esc(P['class']):''].filter(Boolean).join(' · ');
+  var wd=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'][now.getDay()];
+  var hero='<section class="hero"><div class="who"><div class="av" aria-hidden="true">'+(P.photo?'<img src="'+P.photo+'" alt="">':esc((P.name||'؟').trim().charAt(0)||'؟'))+'</div><div style="flex:1;min-width:0"><h1>'+nm+'</h1><div class="line">'+(line||'مشخصات را با دکمهٔ ویرایش کامل کن')+'</div></div><button class="btn" data-act="editprofile">ویرایش مشخصات</button></div>'
+   +'<div class="chips"><span class="chip">امروز '+wd+' '+jdy(now)+'</span><span class="chip">هفتهٔ '+fa(k)+' از '+fa(S.config.weekCount)+'</span><span class="chip">'+(isMaz(k)?'هفتهٔ آزمون ماز':'هفتهٔ بدون آزمون ماز')+'</span></div></section>';
+  var ex=examsAll().filter(function(e){return e.du>=0}),near=ex.filter(function(e){return e.du<=2}),later=ex.filter(function(e){return e.du>2&&e.du<=30});
+  var al='<section class="card"><h2>یادآوری امتحان‌ها<button class="btn sm" data-act="addexam">افزودن امتحان</button></h2>';
+  if(near.length)al+='<div class="alerts">'+near.map(examCard).join('')+'</div>';
+  else al+='<div class="alert ok"><div class="big">✓</div><div><b>تا پس‌فردا امتحانی ثبت نشده</b><div class="small muted">امتحان‌های جدید را با دکمهٔ بالا یا در صفحهٔ هفته‌ها ثبت کن.</div></div></div>';
+  if(later.length)al+='<h3 style="margin-top:12px">امتحان‌های پیش‌رو</h3><div class="alerts">'+later.slice(0,5).map(examCard).join('')+'</div>';
+  al+='</section>';
+  var ap=weekProg(k,true),wp=weekProg(k,false),dp=ti!=null&&tw===k?dayProg(k,DAYIDS[ti],false):null;
+  var totalDone=0,totalAll=0,upTo=tw||k;allAcadWeeks(upTo).forEach(function(i){var p=weekProg(i,true);totalDone+=p.done;totalAll+=p.total});
+  var all=totalAll?Math.round(totalDone*100/totalAll):0,avg=avgOf(S.grades),goal=+P.goal||0;
+  var tiles='<div class="grid g4">'+ring(dp?dp.pc:0,'پیشرفت امروز',dp?fa(dp.done)+' از '+fa(dp.total)+' فعالیت':'امروز خارج از بازهٔ برنامه','var(--accent)')
+    +ring(wp.pc,'پیشرفت این هفته',fa(wp.done)+' از '+fa(wp.total)+' فعالیت','var(--done)')
+    +ring(avg==null?0:avg,'میانگین نمرات',avg==null?'نمره‌ای ثبت نشده':(goal?'هدف '+fa(goal)+'٪':fa(S.grades.length)+' نمره'),'var(--c-math)')
+    +ring(all,'کل برنامه تا امروز',fa(totalDone)+' از '+fa(totalAll)+' فعالیت درسی','var(--c-chem)')+'</div>';
+  var nx='';
+  if(dp){var rs=rowsFor(k,DAYIDS[ti]).filter(function(r){return acad(r)&&!tickOf(k,r.id)}).slice(0,5);
+    nx='<section class="card"><h2>کارهای باقی‌ماندهٔ امروز<button class="btn ghost sm" data-act="gotoday" data-wk="'+k+'" data-d="'+ti+'">برنامهٔ کامل امروز</button></h2>'+(rs.length?'<ol class="rows">'+rs.map(function(r){return rowHtml(k,r,DAYIDS[ti])}).join('')+'</ol>':'<div class="empty">همهٔ فعالیت‌های درسی امروز انجام شده. آفرین!</div>')+'</section>'}
+  var hw=hwAll().filter(function(h){return !h.done&&h.du>=0&&h.du<=7}),hws='<section class="card"><h2>تکالیف پیش‌رو<button class="btn sm" data-act="addhw">افزودن تکلیف</button></h2>'+(hw.length?'<ul class="list">'+hw.slice(0,6).map(function(h){return '<li><label style="display:flex;gap:8px;align-items:center;flex:1;min-width:0"><input type="checkbox" data-hwdone="1" data-wk="'+h.k+'" data-id="'+esc(h.id)+'"><span class="t">'+pill(h.subj)+' '+esc(h.text)+'</span></label><span class="small muted">'+(h.du===0?'امروز':h.du===1?'فردا':fa(h.du)+' روز دیگر')+'</span></li>'}).join('')+'</ul>':'<div class="empty">تکلیفی تا هفتهٔ آینده ثبت نشده.</div>')+'</section>';
+  var sg=SKEYS.map(function(s){var st=subjStats(s,upTo),gl=S.grades.filter(function(g){return g.subj===s}),a=avgOf(gl);
+    return '<button class="scard" style="--sc:'+CLR(s)+'" data-act="subj" data-s="'+s+'"><b>'+SUBJ[s]+'</b>'+pbar(st.pc,'انجام '+p0(st.pc))+'<span class="small muted">'+(a==null?'بدون نمره':'میانگین نمره '+p0(a))+'</span></button>'}).join('');
+  return hero+al+tiles+nx+'<div class="grid g2">'+hws+'<section class="card"><h2>درس‌ها</h2><div class="grid gs">'+sg+'</div></section></div>'}
+
+function pDays(){
+  var k=ui.wk||curWeek(),ti=todayIdx(),tw=todayWeekReal();if(ui.day==null)ui.day=(tw===k&&ti!=null)?ti:0;
+  var di=ui.day,id=DAYIDS[di],d=TPL.days[di],dt=dayDate(k,di);
+  var seg='<div class="seg" role="group" aria-label="روز هفته">'+TPL.days.map(function(x,i){return '<button data-act="day" data-d="'+i+'" aria-pressed="'+(i===di)+'" class="'+(tw===k&&ti===i?'today':'')+'">'+x.name+'<small>'+jd(dayDate(k,i))+'</small></button>'}).join('')+'</div>';
+  var p=dayProg(k,id,false),w=W(k);
+  var ex=examsAll().filter(function(e){return e.k===k&&e.day===di}),hw=(w.hw||[]).filter(function(h){return h.day===di});
+  var inf='';if(ex.length||hw.length)inf='<div class="alerts">'+ex.map(function(e){return '<div class="alert a1"><div class="big">!</div><div><b>'+esc(examTitle(e))+'</b><div class="small muted">امتحان این روز'+(e.time?' · ساعت '+fa(e.time):'')+'</div></div></div>'}).join('')+hw.map(function(h){return '<div class="alert a3"><div><b>تکلیف: '+esc(NAME(h.subj))+'</b><div class="small muted">'+esc(h.text)+'</div></div></div>'}).join('')+'</div>';
+  return '<section class="card"><div class="tabrow"><h2 style="margin:0">ایام هفته</h2>'+weekSel(k)+'</div></section>'+seg
+   +'<section class="card"><h2><span>'+d.name+' '+jdy(dt)+'</span><button class="btn sm" data-act="addrow" data-wk="'+k+'" data-day="'+id+'">افزودن فعالیت</button></h2><div class="small muted" style="margin-bottom:8px">مدرسه: '+esc(d.school)+' · '+esc(d.online)+'</div>'+pbar(p.pc,fa(p.done)+' از '+fa(p.total)+' ('+p0(p.pc)+')')+'<div style="height:10px"></div>'+inf+(inf?'<div style="height:8px"></div>':'')+dayRows(k,id)+'</section>'}
+
+function pSubjects(){
+  var s=ui.sub,k=ui.wk||curWeek(),upTo=todayWeekReal()||k;
+  var cards='<div class="grid g3">'+SKEYS.concat(['pe']).map(function(x){var st=x==='pe'?null:subjStats(x,upTo),gl=S.grades.filter(function(g){return g.subj===x}),a=avgOf(gl),days=Object.keys(SCHOOL).filter(function(d){return SCHOOL[d].indexOf(x)>=0}).map(function(d){return DNAME[d]}).join('، ');
+    return '<button class="scard" style="--sc:'+CLR(x)+'" data-act="subj" data-s="'+x+'" aria-pressed="'+(x===s)+'"><b>'+SUBJ[x]+'</b><span class="small muted">مدرسه: '+(days||'—')+'</span>'+(st?pbar(st.pc,p0(st.pc)):'')+'<span class="small muted">'+(a==null?'بدون نمره':'میانگین '+p0(a))+'</span></button>'}).join('')+'</div>';
+  var h='<section class="card"><h2>درس‌ها</h2><p class="muted small" style="margin-bottom:10px">یک درس را بزن تا برنامهٔ هفتگی همان درس را ببینی و تیک بزنی.</p>'+cards+'</section>';
+  if(s==='pe'){return h+'<section class="card"><h2>'+SUBJ.pe+'</h2><div class="empty">ورزش فقط در مدرسه (چهارشنبه) است و برنامهٔ خانگی ندارد.</div></section>'}
+  var rows=[];DAYIDS.forEach(function(id,i){rowsFor(k,id).forEach(function(r){if(r.t==='row'&&r.subj===s&&acad(r))rows.push({r:r,id:id,i:i})})});
+  var cls=rows.filter(function(x){return x.r.kind==='class'}),st=rows.filter(function(x){return x.r.kind!=='class'});
+  var sch=Object.keys(SCHOOL).filter(function(d){return SCHOOL[d].indexOf(s)>=0});
+  var sp=0,sd=0,sm=0;rows.forEach(function(x){var m=dur(x.r.s,x.r.e);sp+=m;if(tickOf(k,x.r.id)){sd++;sm+=m}});
+  var hw=(W(k).hw||[]).map(function(x,ix){return {h:x}}).filter(function(x){return x.h.subj===s}),ex=examsAll().filter(function(e){return e.k===k&&e.subj===s}),gl=gsorted().filter(function(g){return g.subj===s});
+  function group(list){if(!list.length)return '<div class="empty">در این هفته موردی نیست.</div>';var by={};list.forEach(function(x){(by[x.id]=by[x.id]||[]).push(x)});
+    return DAYIDS.filter(function(id){return by[id]}).map(function(id){return '<h3 style="margin-top:8px">'+DNAME[id]+' · '+jd(dayDate(k,DAYIDS.indexOf(id)))+'</h3><ol class="rows">'+by[id].map(function(x){return rowHtml(k,x.r,id)}).join('')+'</ol>'}).join('')}
+  var det='<section class="card" style="border-top:5px solid '+CLR(s)+'"><div class="tabrow"><h2 style="margin:0">'+SUBJ[s]+'</h2>'+weekSel(k)+'</div>'
+   +'<div class="small muted" style="margin:6px 0 10px">مدرسه: '+(sch.length?sch.map(function(d){return DNAME[d]}).join('، '):'—')+' · برنامهٔ این هفته: '+hrs(sp)+'، انجام‌شده: '+hrs(sm)+'</div>'+pbar(rows.length?Math.round(sd*100/rows.length):0,fa(sd)+' از '+fa(rows.length)+' فعالیت')
+   +'<h3 style="margin-top:14px">کلاس‌ها</h3>'+group(cls)+'<h3 style="margin-top:14px">مطالعه، مرور و تست خانگی</h3>'+group(st)+'</section>';
+  var side='<div class="grid g2"><section class="card"><h2>تکلیف و امتحان این هفته</h2>'
+   +(ex.length?'<div class="alerts">'+ex.map(examCard).join('')+'</div>':'')
+   +(hw.length?'<ul class="list" style="margin-top:8px">'+hw.map(function(x){var h=x.h;return '<li class="'+(h.done?'done':'')+'"><label style="display:flex;gap:8px;align-items:center;flex:1;min-width:0"><input type="checkbox" data-hwdone="1" data-wk="'+k+'" data-id="'+esc(h.id)+'"'+(h.done?' checked':'')+'><span class="t">'+esc(h.text)+' <span class="small muted">('+DNAME[DAYIDS[h.day]]+')</span></span></label></li>'}).join('')+'</ul>':'')
+   +(!ex.length&&!hw.length?'<div class="empty">چیزی ثبت نشده.</div>':'')+'<div class="acts" style="margin-top:10px"><button class="btn sm" data-act="addhw" data-s="'+s+'" data-wk="'+k+'">افزودن تکلیف</button><button class="btn ghost sm" data-act="addexam" data-s="'+s+'" data-wk="'+k+'">افزودن امتحان</button></div></section>'
+   +'<section class="card"><h2>نمره‌های '+SUBJ[s]+'</h2>'+(gl.length?'<ul class="list">'+gl.slice().reverse().map(function(g){return '<li><span class="t">'+esc(g.title||GTYPES[g.type])+' <span class="small muted">· '+esc(GTYPES[g.type])+'</span></span><b>'+fa(g.score)+' از '+fa(g.max)+' · '+p0(pctOf(g))+'</b></li>'}).join('')+'</ul>':'<div class="empty">نمره‌ای ثبت نشده.</div>')+'<div class="acts" style="margin-top:10px"><button class="btn sm" data-act="addgrade" data-s="'+s+'">ثبت نمره</button></div></section></div>';
+  return h+det+side}
+
+function pWeeks(){
+  if(ui.openWeek)return pWeekDetail(ui.openWeek);
+  var cur=todayWeekReal(),cards='';
+  for(var k=1;k<=S.config.weekCount;k++){var p=weekProg(k,false),w=W(k),ne=(w.exams||[]).length+(isMaz(k)?1:0),nh=(w.hw||[]).filter(function(h){return !h.done}).length;
+    cards+='<button class="wk'+(cur===k?' cur':'')+'" data-act="openweek" data-wk="'+k+'"><div class="top"><b>هفتهٔ '+fa(k)+(cur===k?' (این هفته)':'')+'</b><span class="badge'+(isMaz(k)?'':' n')+'">'+(isMaz(k)?'ماز':'عادی')+'</span></div><div class="small muted">'+weekRange(k)+'</div>'+pbar(p.pc,p0(p.pc))+'<div class="small muted">'+fa(ne)+' امتحان · '+fa(nh)+' تکلیف باز</div></button>'}
+  return '<section class="card"><h2>هفته‌ها تا پایان سال<button class="btn ghost sm" data-act="addweek">افزودن هفته</button></h2><p class="muted small" style="margin-bottom:10px">یک هفته را بزن تا برنامهٔ کامل، امتحان‌ها و تکالیف آن هفته را ببینی و ویرایش کنی.</p><div class="grid g3">'+cards+'</div></section>'}
+function pWeekDetail(k){
+  var w=W(k),p=weekProg(k,false),tw=todayWeekReal(),ti=todayIdx(),maz=isMaz(k);
+  var head='<section class="card"><div class="tabrow"><h2 style="margin:0">هفتهٔ '+fa(k)+' <span class="small muted">'+weekRange(k)+'</span></h2><div class="acts"><button class="btn ghost sm" data-act="backweeks">همهٔ هفته‌ها</button></div></div><div style="height:8px"></div>'+weekSel(k)
+   +'<div class="tabrow" style="margin-top:10px"><div class="sw" role="group" aria-label="نوع هفته"><button data-act="setmaz" data-v="0" data-wk="'+k+'" aria-pressed="'+!maz+'">هفتهٔ بدون ماز</button><button data-act="setmaz" data-v="1" data-wk="'+k+'" aria-pressed="'+maz+'">هفتهٔ آزمون ماز</button></div></div><div style="height:10px"></div>'+pbar(p.pc,fa(p.done)+' از '+fa(p.total)+' ('+p0(p.pc)+')')+'</section>';
+  var days=TPL.days.map(function(d,i){var dp=dayProg(k,d.id,false);
+    return '<details class="day"'+(tw===k&&ti===i?' open':'')+'><summary><span style="flex:1">'+d.name+' <span class="small muted">'+jd(dayDate(k,i))+'</span></span><span class="small muted">'+esc(d.online)+'</span><span class="badge n">'+p0(dp.pc)+'</span></summary><div style="padding-bottom:8px"><div class="small muted" style="margin-bottom:8px">مدرسه: '+esc(d.school)+'</div>'+dayRows(k,d.id)+'<div class="acts" style="margin:10px 0"><button class="btn ghost sm" data-act="addrow" data-wk="'+k+'" data-day="'+d.id+'">افزودن فعالیت</button></div></div></details>'}).join('');
+  var ex=examsAll().filter(function(e){return e.k===k});
+  var exh='<section class="card"><h2>امتحان‌ها<button class="btn sm" data-act="addexam" data-wk="'+k+'">افزودن امتحان</button></h2>'+(ex.length?'<ul class="list">'+ex.map(function(e){return '<li><span class="t">'+pill(e.subj)+' '+esc(examTitle(e))+' <span class="small muted">· '+DNAME[DAYIDS[e.day]]+' '+jd(e.date)+(e.time?' · '+fa(e.time):'')+'</span></span>'+(e.auto?'':'<button class="ib" data-act="delexam" data-wk="'+k+'" data-id="'+esc(e.id)+'" aria-label="حذف">'+icon('x')+'</button>')+'</li>'}).join('')+'</ul>':'<div class="empty">امتحانی برای این هفته ثبت نشده.</div>')+'</section>';
+  var hw=w.hw||[],hwh='<section class="card"><h2>تکالیف متغیر<button class="btn sm" data-act="addhw" data-wk="'+k+'">افزودن تکلیف</button></h2>'+(hw.length?'<ul class="list">'+hw.map(function(h){return '<li class="'+(h.done?'done':'')+'"><label style="display:flex;gap:8px;align-items:center;flex:1;min-width:0"><input type="checkbox" data-hwdone="1" data-wk="'+k+'" data-id="'+esc(h.id)+'"'+(h.done?' checked':'')+'><span class="t">'+pill(h.subj)+' '+esc(h.text)+' <span class="small muted">· تا '+DNAME[DAYIDS[h.day]]+'</span></span></label><button class="ib" data-act="delhw" data-wk="'+k+'" data-id="'+esc(h.id)+'" aria-label="حذف">'+icon('x')+'</button></li>'}).join('')+'</ul>':'<div class="empty">تکلیف متغیری ثبت نشده.</div>')+'</section>';
+  var nt='<section class="card"><h2>یادداشت‌های هفته</h2><textarea id="notes" data-wk="'+k+'" placeholder="مثلاً مبحث‌های ضعیف، تغییر ساعت کلاس، نکته‌های معلم...">'+esc(w.notes)+'</textarea></section>';
+  var rs='<div class="acts"><button class="btn danger sm" data-act="resetweek" data-wk="'+k+'">بازگرداندن برنامهٔ این هفته به حالت پایه</button></div>';
+  return head+'<div class="grid g2">'+exh+hwh+'</div>'+nt+'<section class="card"><h2>برنامهٔ کامل هفته</h2><div class="grid">'+days+'</div></section>'+rs}
+
+function pGrades(){
+  var g=gsorted().reverse(),avg=avgOf(S.grades),bySub={};
+  S.grades.forEach(function(x){(bySub[x.subj]=bySub[x.subj]||[]).push(x)});
+  var sa=Object.keys(bySub).map(function(s){return {s:s,a:avgOf(bySub[s])}}).sort(function(a,b){return b.a-a.a});
+  var sum='<div class="grid g3"><div class="tile"><div class="lab">میانگین کل</div><div style="font-size:1.8rem;font-weight:800">'+(avg==null?'—':p0(avg))+'</div><div class="sub">'+fa(S.grades.length)+' نمره ثبت شده</div></div>'
+   +'<div class="tile"><div class="lab">قوی‌ترین درس</div><div style="font-size:1.3rem;font-weight:800">'+(sa.length?esc(NAME(sa[0].s)):'—')+'</div><div class="sub">'+(sa.length?p0(sa[0].a):'')+'</div></div>'
+   +'<div class="tile"><div class="lab">درس نیازمند تقویت</div><div style="font-size:1.3rem;font-weight:800">'+(sa.length>1?esc(NAME(sa[sa.length-1].s)):'—')+'</div><div class="sub">'+(sa.length>1?p0(sa[sa.length-1].a):'')+'</div></div></div>';
+  var list=g.length?'<ul class="list">'+g.map(function(x){return '<li><span class="t">'+pill(x.subj)+' <b>'+esc(x.title||GTYPES[x.type])+'</b> <span class="small muted">· '+esc(GTYPES[x.type])+' · '+DNAME[DAYIDS[x.day]]+' '+jd(dayDate(x.wk,x.day))+'</span></span><b>'+fa(x.score)+' از '+fa(x.max)+' · '+p0(pctOf(x))+'</b><button class="ib" data-act="delgrade" data-id="'+esc(x.id)+'" aria-label="حذف">'+icon('x')+'</button></li>'}).join('')+'</ul>':'<div class="empty">هنوز نمره‌ای ثبت نشده. با دکمهٔ «ثبت نمره» شروع کن.</div>';
+  return '<section class="card"><h2>نمرات اکتسابی<button class="btn sm" data-act="addgrade">ثبت نمره</button></h2><p class="muted small">درصد هر نمره از تقسیم نمره بر بیشترین نمره محاسبه می‌شود و در داشبورد و آمار استفاده می‌شود.</p></section>'+sum+'<section class="card"><h2>فهرست نمره‌ها</h2>'+list+'</section>'}
+
+function pStats(){
+  var upTo=todayWeekReal()||curWeek(),items=[];
+  for(var k=1;k<=upTo;k++){var p=weekProg(k,true);items.push({x:fa(k),v:p.pc,t:'هفتهٔ '+fa(k)+': '+p0(p.pc)})}
+  var tot=weekProg(upTo,true),allm=0,allp=0;allAcadWeeks(upTo).forEach(function(k){var p=weekProg(k,true);allm+=p.mins;allp+=p.planned});
+  var sb=SKEYS.map(function(s){var st=subjStats(s,upTo),a=avgOf(S.grades.filter(function(g){return g.subj===s}));
+    return '<div class="hb" style="--sc:'+CLR(s)+'"><span>'+SUBJ[s]+'</span><div class="t"><i style="width:'+st.pc+'%"></i></div><span class="v">'+p0(st.pc)+'</span></div>'}).join('');
+  var gb=SKEYS.map(function(s){var a=avgOf(S.grades.filter(function(g){return g.subj===s}));
+    return '<div class="hb" style="--sc:'+CLR(s)+'"><span>'+SUBJ[s]+'</span><div class="t"><i style="width:'+(a||0)+'%"></i></div><span class="v">'+(a==null?'—':p0(a))+'</span></div>'}).join('');
+  var all=gsorted().map(function(g){return {x:NAME(g.subj).slice(0,6),y:pctOf(g),t:NAME(g.subj)+' · '+p0(pctOf(g))}});
+  var maz=gsorted().filter(function(g){return g.type==='maz'}).map(function(g,i){return {x:'ماز '+fa(i+1),y:pctOf(g),t:(g.title||'آزمون ماز')+' · '+p0(pctOf(g))}});
+  var hm=SKEYS.map(function(s){var st=subjStats(s,upTo);return '<div class="hb" style="--sc:'+CLR(s)+'"><span>'+SUBJ[s]+'</span><div class="t"><i style="width:'+(st.planned?Math.round(st.mins*100/st.planned):0)+'%"></i></div><span class="v">'+hrs(st.mins)+'</span></div>'}).join('');
+  return '<section class="card"><h2>آمار و پیشرفت</h2><div class="grid g4">'+ring(tot.pc,'این هفته',fa(tot.done)+' از '+fa(tot.total),'var(--done)')+ring(allp?Math.round(allm*100/allp):0,'کل مدت برنامه',hrs(allm)+' از '+hrs(allp),'var(--accent)')+ring(avgOf(S.grades)||0,'میانگین نمرات',fa(S.grades.length)+' نمره','var(--c-math)')+ring(maz.length?maz[maz.length-1].y:0,'آخرین آزمون ماز',maz.length?'از '+fa(maz.length)+' آزمون':'ثبت نشده','var(--c-ink)')+'</div></section>'
+   +'<section class="card"><h2>درصد انجام برنامه در هر هفته</h2>'+barChart(items,'نمودار انجام برنامهٔ هفتگی')+'</section>'
+   +'<div class="grid g2"><section class="card"><h2>پیشرفت درس‌ها (انجام فعالیت‌ها)</h2>'+sb+'</section><section class="card"><h2>میانگین نمرهٔ درس‌ها</h2>'+gb+'</section></div>'
+   +'<div class="grid g2"><section class="card"><h2>روند نمره‌ها</h2>'+lineChart(all,{label:'روند نمره‌ها'})+'</section><section class="card"><h2>روند آزمون‌های ماز</h2>'+lineChart(maz,{label:'روند آزمون ماز'})+'</section></div>'
+   +'<section class="card"><h2>مدت مطالعهٔ انجام‌شده در هر درس</h2>'+hm+'</section>'}
+
+var PAGEFN={dashboard:pDashboard,days:pDays,subjects:pSubjects,weeks:pWeeks,grades:pGrades,stats:pStats};
+function render(){
+  var y=window.scrollY;
+  document.getElementById('nav').innerHTML=PAGES.map(function(p){return '<button data-go="'+p[0]+'"'+(ui.page===p[0]?' aria-current="page"':'')+'>'+icon(p[2])+'<span>'+p[1]+'</span></button>'}).join('');
+  document.getElementById('view').innerHTML=PAGEFN[ui.page]();
+  window.scrollTo(0,y)}
+function go(p){ui.page=p;if(p!=='weeks')ui.openWeek=null;try{if(location.hash!=='#'+p)location.hash=p}catch(e){}render();window.scrollTo(0,0)}
+
+/* ---------- modals ---------- */
+function openModal(title,body,onSave,extra){
+  ui.modal=true;var L=document.getElementById('layer');
+  L.innerHTML='<div class="ov" id="ov"><form class="modal" id="mf" role="dialog" aria-modal="true" aria-label="'+esc(title)+'"><h2>'+esc(title)+'</h2>'+body+'<div class="acts"><button class="btn" type="submit">ذخیره</button><button class="btn ghost" type="button" data-m="close">انصراف</button>'+(extra||'')+'</div></form></div>';
+  var f=document.getElementById('mf');f.addEventListener('submit',function(e){e.preventDefault();var fd=new FormData(f),o={};fd.forEach(function(v,k){o[k]=v});if(onSave(o)!==false)closeModal()});
+  var first=f.querySelector('input,select,textarea');if(first)first.focus();return f}
+function closeModal(){ui.modal=false;document.getElementById('layer').innerHTML='';if(pendingRender){pendingRender=false}render()}
+function uid(p){return p+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36)}
+function fld(label,input,hint){return '<label class="fl">'+label+input+(hint?'<span class="h">'+hint+'</span>':'')+'</label>'}
+
+function mProfile(){var P=prof(),photo=P.photo||'';
+  openModal('مشخصات دانش‌آموز','<div class="fl">عکس<div style="display:flex;gap:12px;align-items:center"><span class="av" style="background:var(--surface2);border-color:var(--line);color:var(--fg)" id="pv">'+(photo?'<img src="'+photo+'" alt="">':'؟')+'</span><input type="file" id="pf" accept="image/*" class="f"></div></div>'+fld('نام و نام خانوادگی','<input class="f" type="text" name="name" value="'+esc(P.name||'')+'">')
+   +'<div class="fl r"><div>'+fld('پایه','<input class="f" type="text" name="grade" value="'+esc(P.grade||'')+'">')+'</div><div>'+fld('رشتهٔ تحصیلی','<input class="f" type="text" name="field" value="'+esc(P.field||'')+'">')+'</div></div>'
+   +fld('دبیرستان','<input class="f" type="text" name="school" value="'+esc(P.school||'')+'">')
+   +'<div class="fl r"><div>'+fld('شهر','<input class="f" type="text" name="city" value="'+esc(P.city||'')+'">')+'</div><div>'+fld('کلاس','<input class="f" type="text" name="class" value="'+esc(P['class']||'')+'">')+'</div></div>'
+   +fld('هدف میانگین نمرات (درصد)','<input class="f" type="text" inputmode="decimal" name="goal" value="'+esc(P.goal||'')+'">','مثلاً ۹۰؛ در داشبورد نمایش داده می‌شود')
+   ,function(o){S.profile={photo:photo,name:o.name.trim(),grade:o.grade.trim(),field:o.field.trim(),school:o.school.trim(),city:o.city.trim(),'class':o['class'].trim(),goal:norm(o.goal)};mark('app/profile')});
+  var pf=document.getElementById('pf');
+  if(pf)pf.addEventListener('change',function(){var fl=pf.files&&pf.files[0];if(!fl)return;var img=new Image(),u=URL.createObjectURL(fl);img.onload=function(){var m=Math.min(img.width,img.height),c=document.createElement('canvas');c.width=c.height=240;c.getContext('2d').drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,240,240);photo=c.toDataURL('image/jpeg',.82);document.getElementById('pv').innerHTML='<img src="'+photo+'" alt="">';URL.revokeObjectURL(u)};img.src=u})}
+function mRow(k,dayId,rowId){
+  var rs=rowsFor(k,dayId),r=rowId?rs.filter(function(x){return x.id===rowId})[0]:null,isNew=!r;
+  r=r||{s:'16:00',e:'17:00',subj:'',text:'',kind:'study',base:false};
+  var kinds=Object.keys(KINDS).map(function(x){return '<option value="'+x+'"'+(x===r.kind?' selected':'')+'>'+KINDS[x]+'</option>'}).join('');
+  var body='<div class="fl r"><div>'+fld('شروع','<input class="f" type="time" name="s" required value="'+r.s+'">')+'</div><div>'+fld('پایان','<input class="f" type="time" name="e" required value="'+r.e+'">')+'</div></div>'
+   +'<div class="fl r"><div>'+fld('درس','<select class="f" name="subj">'+subjOpts(r.subj,false,true)+'<option value="fix"'+(r.subj==='fix'?' selected':'')+'>رفع اشکال</option><option value="plan"'+(r.subj==='plan'?' selected':'')+'>برنامه‌ریزی</option></select>')+'</div><div>'+fld('نوع فعالیت','<select class="f" name="kind">'+kinds+'</select>')+'</div></div>'
+   +fld('شرح فعالیت','<textarea class="f" name="text" required>'+esc(r.text)+'</textarea>');
+  var scope='<div class="fl">اعمال برای<div class="radio"><label><input type="radio" name="scope" value="week" checked> فقط هفتهٔ '+fa(k)+'</label><label><input type="radio" name="scope" value="all"> همهٔ هفته‌ها</label></div></div>';
+  if(!isNew&&!r.base)scope='';
+  var extra='';if(!isNew)extra='<button class="btn danger" type="button" data-m="delrow">حذف</button>'+(r.base&&(S.config.edits[rowId]||W(k).edits[rowId])?'<button class="btn ghost" type="button" data-m="restore">بازگشت به پایه</button>':'');
+  var f=openModal(isNew?'افزودن فعالیت':'ویرایش فعالیت',body+scope,function(o){
+    var vals={s:o.s,e:o.e,subj:o.subj,kind:o.kind,text:o.text.trim()};
+    if(isNew){var x=Object.assign({id:uid('x'),day:dayId,t:'row',mode:'both'},vals);if(o.scope==='all'){S.config.extra.push(x);mark('app/config')}else{W(k).extra.push(x);touchW(k)}}
+    else if(!r.base){var arr=r.scope==='all'?S.config.extra:W(k).extra,t=arr.filter(function(y){return y.id===r.id})[0];if(t)Object.assign(t,vals);r.scope==='all'?mark('app/config'):touchW(k)}
+    else{if(o.scope==='all'){S.config.edits[rowId]=vals;mark('app/config')}else{W(k).edits[rowId]=vals;touchW(k)}}
+  },extra);
+  f.addEventListener('click',function(e){var m=e.target.getAttribute&&e.target.getAttribute('data-m');
+    if(m==='delrow'){if(!r.base){var arr=r.scope==='all'?S.config.extra:W(k).extra,ix=arr.findIndex(function(y){return y.id===r.id});if(ix>=0)arr.splice(ix,1);r.scope==='all'?mark('app/config'):touchW(k)}
+      else{var sc=f.querySelector('input[name=scope]:checked');if(sc&&sc.value==='all'){S.config.hidden[rowId]=1;mark('app/config')}else{W(k).hidden[rowId]=1;touchW(k)}}closeModal()}
+    if(m==='restore'){delete S.config.edits[rowId];delete W(k).edits[rowId];mark('app/config');touchW(k);closeModal()}})}
+function mExam(k,subj){
+  k=k||ui.wk||curWeek();var ti=todayIdx(),w0=todayWeekReal()===k&&ti!=null?ti:0;
+  openModal('افزودن امتحان',fld('هفته','<select class="f" name="wk">'+weekOpts(k)+'</select>')
+   +'<div class="fl r"><div>'+fld('روز','<select class="f" name="day">'+daySel(w0)+'</select>')+'</div><div>'+fld('درس','<select class="f" name="subj">'+subjOpts(subj||'bio',false,false)+'</select>')+'</div></div>'
+   +'<div class="fl r"><div>'+fld('ساعت (اختیاری)','<input class="f" type="time" name="time">')+'</div><div>'+fld('مبحث (اختیاری)','<input class="f" type="text" name="topic" placeholder="مثلاً فصل ۳">')+'</div></div>'
+   ,function(o){var wk=+o.wk;W(wk).exams.push({id:uid('e'),subj:o.subj,day:+o.day,time:o.time||'',topic:o.topic.trim()});touchW(wk)})}
+function mHw(k,subj){
+  k=k||ui.wk||curWeek();
+  openModal('افزودن تکلیف',fld('هفته','<select class="f" name="wk">'+weekOpts(k)+'</select>')
+   +'<div class="fl r"><div>'+fld('درس','<select class="f" name="subj">'+subjOpts(subj||'phys',false,false)+'</select>')+'</div><div>'+fld('موعد (روز)','<select class="f" name="day">'+daySel(0)+'</select>')+'</div></div>'
+   +fld('شرح تکلیف','<textarea class="f" name="text" required placeholder="مثلاً ۲۰ تست فصل ۲ و حل تمرین‌های صفحهٔ ۴۵"></textarea>')
+   ,function(o){var wk=+o.wk;W(wk).hw.push({id:uid('h'),subj:o.subj,day:+o.day,text:o.text.trim(),done:false});touchW(wk)})}
+function mGrade(subj){
+  var k=todayWeekReal()||curWeek(),ti=todayIdx()||0;
+  openModal('ثبت نمره',
+   '<div class="fl r"><div>'+fld('درس','<select class="f" name="subj">'+subjOpts(subj||'bio',true,false)+'</select>')+'</div><div>'+fld('نوع','<select class="f" name="type">'+Object.keys(GTYPES).map(function(t){return '<option value="'+t+'">'+GTYPES[t]+'</option>'}).join('')+'</select>')+'</div></div>'
+   +fld('عنوان (اختیاری)','<input class="f" type="text" name="title" placeholder="مثلاً امتحان فصل ۱">')
+   +'<div class="fl r"><div>'+fld('نمره','<input class="f" type="text" inputmode="decimal" name="score" required placeholder="۱۷٫۵">')+'</div><div>'+fld('بیشترین نمره','<input class="f" type="text" inputmode="decimal" name="max" required value="۲۰">','برای ماز می‌تواند ۱۰۰ باشد')+'</div></div>'
+   +'<div class="fl r"><div>'+fld('هفته','<select class="f" name="wk">'+weekOpts(k)+'</select>')+'</div><div>'+fld('روز','<select class="f" name="day">'+daySel(ti)+'</select>')+'</div></div>'
+   ,function(o){var sc=parseFloat(norm(o.score)),mx=parseFloat(norm(o.max));if(!(mx>0)||isNaN(sc)||sc<0||sc>mx){toast('نمره باید عددی بین صفر و بیشترین نمره باشد.');return false}
+    S.grades.push({id:uid('g'),subj:o.subj,type:o.type,title:o.title.trim(),score:sc,max:mx,wk:+o.wk,day:+o.day});mark('app/grades')})}
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(e){
+  var g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}
+  if(e.target.id==='ov'){closeModal();return}
+  var m=e.target.closest('[data-m="close"]');if(m){closeModal();return}
+  var t=e.target.closest('[data-act]');if(!t)return;var a=t.dataset.act,k=+t.dataset.wk||ui.wk||curWeek();
+  if(a==='editprofile')mProfile();
+  else if(a==='addexam')mExam(+t.dataset.wk||null,t.dataset.s);
+  else if(a==='addhw')mHw(+t.dataset.wk||null,t.dataset.s);
+  else if(a==='addgrade')mGrade(t.dataset.s);
+  else if(a==='editrow')mRow(+t.dataset.wk,t.dataset.day,t.dataset.id);
+  else if(a==='addrow')mRow(+t.dataset.wk,t.dataset.day,null);
+  else if(a==='day'){ui.day=+t.dataset.d;render()}
+  else if(a==='gotoday'){ui.wk=+t.dataset.wk;ui.day=+t.dataset.d;go('days')}
+  else if(a==='wkprev'){ui.wk=Math.max(1,(ui.wk||curWeek())-1);render()}
+  else if(a==='wknext'){ui.wk=Math.min(S.config.weekCount,(ui.wk||curWeek())+1);render()}
+  else if(a==='subj'){ui.sub=t.dataset.s;if(ui.page!=='subjects')ui.page='subjects';render();window.scrollTo(0,0)}
+  else if(a==='openweek'){ui.openWeek=+t.dataset.wk;ui.wk=ui.openWeek;render();window.scrollTo(0,0)}
+  else if(a==='backweeks'){ui.openWeek=null;render()}
+  else if(a==='setmaz'){W(k).maz=t.dataset.v==='1';touchW(k);render()}
+  else if(a==='delexam'){var w=W(k);w.exams=w.exams.filter(function(x){return x.id!==t.dataset.id});touchW(k);render()}
+  else if(a==='delhw'){var w2=W(k);w2.hw=w2.hw.filter(function(x){return x.id!==t.dataset.id});touchW(k);render()}
+  else if(a==='delgrade'){S.grades=S.grades.filter(function(x){return x.id!==t.dataset.id});mark('app/grades');render()}
+  else if(a==='addweek'){S.config.weekCount++;mark('app/config');toast('یک هفتهٔ جدید اضافه شد.');render()}
+  else if(a==='resetweek'){var w3=W(k);w3.edits={};w3.hidden={};w3.extra=[];touchW(k);toast('برنامهٔ این هفته به حالت پایه برگشت.');render()}
+});
+document.addEventListener('change',function(e){var t=e.target;
+  if(t.dataset.tick){var w=W(+t.dataset.wk);w.ticks[t.dataset.id]=t.checked?1:0;touchW(+t.dataset.wk);render()}
+  else if(t.dataset.hwdone){var h=(W(+t.dataset.wk).hw||[]).filter(function(x){return x.id===t.dataset.id})[0];if(h){h.done=t.checked;touchW(+t.dataset.wk);render()}}
+  else if(t.dataset.sel==='wk'){ui.wk=+t.value;if(ui.page==='weeks')ui.openWeek=ui.wk;render()}});
+var nT=null;
+document.addEventListener('input',function(e){var t=e.target;if(t.id==='notes'){var k=+t.dataset.wk;W(k).notes=t.value;clearTimeout(nT);nT=setTimeout(function(){touchW(k)},600)}});
+document.addEventListener('focusout',function(){if(pendingRender&&!ui.modal){setTimeout(function(){if(!busy()){pendingRender=false;render()}},50)}});
+window.addEventListener('hashchange',function(){var h=location.hash.slice(1);if(PAGEFN[h]&&h!==ui.page){ui.page=h;if(h!=='weeks')ui.openWeek=null;render()}});
+var h0=location.hash.slice(1);if(PAGEFN[h0])ui.page=h0;
+ui.wk=curWeek();
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){navigator.serviceWorker.register('sw.js').catch(function(){})}
+setSync(false);render();
+if(OFFLINE){document.getElementById('bk').hidden=false;
+  document.getElementById('bkx').addEventListener('click',function(){var a=document.createElement('a'),d=new Date(),n='kiana-plan-backup-'+d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+'.json';
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download=n;document.body.appendChild(a);a.click();a.remove();toast('فایل پشتیبان ذخیره شد.')});
+  var bf=document.getElementById('bkf');document.getElementById('bki').addEventListener('click',function(){bf.click()});
+  bf.addEventListener('change',function(){var f=bf.files&&bf.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var o=JSON.parse(r.result);if(!o||!o.config)throw 0;S=o;S.profile=S.profile||{};S.weeks=S.weeks||{};S.grades=S.grades||[];saveLocal();render();toast('پشتیبان بازیابی شد.')}catch(e){toast('این فایل پشتیبان معتبر نیست.')}};r.readAsText(f)})}
+else initDb();
+})();
+</script>
+
+</body>
+</html>
